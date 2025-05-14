@@ -23,7 +23,7 @@ https://minecraft-enchantment-order.onrender.com
 
 ## Video Showcase
 
-https://github.com/user-attachments/assets/ca4885be-4280-4149-ac30-4c4ddadaa25a
+https://github.com/user-attachments/assets/47b4a68b-bdb1-458c-9afa-195a1eeb74c6
 
 
 ##  Quick Start
