@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang=\"en\">
+<head>
+    <meta charset=\"utf-8\">
+    <title>Minecraft Enchant Planner</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 2rem;
+            max-width: 960px
+        }
+
+        table, th, td {
+            border: 1px solid #888;
+            border-collapse: collapse;
+            padding: 4px
+        }
+
+        th {
+            background: #eee
+        }
+
+        .warn {
+            color: #c00
+        }
+    </style>
+</head>
+<body>
+{% with msgs = get_flashed_messages() %}
+    {% if msgs %}
+        <ul class=warn>{% for m in msgs %}
+            <li>{{ m }}</li>{% endfor %}</ul>{% endif %}
+{% endwith %}
+{% block body %}{% endblock %}
+</body>
+</html>

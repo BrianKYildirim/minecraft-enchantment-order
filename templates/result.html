@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block body %}
+    <h2>Optimal anvil sequence</h2>
+
+    <ol>
+        {% for s in plan.steps %}
+            <li>
+                Combine {{ s.left.pretty() }} + {{ s.right.pretty() }}
+                → <strong>{{ s.cost_levels }} Levels</strong> ({{ s.cost_xp }}xp),
+                Prior‑work penalty = {{ s.result_prior }}
+            </li>
+        {% endfor %}
+    </ol>
+
+    <h3>Totals</h3>
+    <p>{{ plan.total_levels }} levels ({{ plan.total_xp }}xp)<br>
+        Final prior‑work penalty: {{ plan.final_prior_work }}</p>
+
+    <p><a href="/">↩ start over</a></p>
+{% endblock %}
