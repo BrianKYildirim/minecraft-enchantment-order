@@ -6,27 +6,33 @@
     </h1>
 
     <div class="mx-auto max-w-3xl text-sm text-slate-300 space-y-4 mb-12">
-    <p>
-      When enchanting items in <span class="font-semibold text-white">Minecraft</span>, the order
-      in which you combine armor, weapons, and tools with books in your anvil makes a
-      <span class="font-semibold text-white">huge difference</span>. Each time you work on an anvil,
-      you increase the <span class="font-semibold text-white">work penalty</span>. Once that penalty
-      gets too high, you simply can't add any more enchantments and the anvil says
-      “<span class="font-semibold text-white">Too Expensive</span>!”.
-      This planner finds the <span class="font-semibold text-white">optimal sequence</span> of
-      book combinations to keep your <span class="font-semibold text-white">XP cost</span> as low as possible.
-    </p>
-    <p>
-      This tool assumes your gear and books start with
-      <span class="font-semibold text-white">zero work penalty</span>. In other words, you haven’t
-      previously merged lower-level books (e.g. two Level 1 → Level 2) or used the anvil on that
-      item. To achieve <span class="font-semibold text-white">max-level enchantments</span> you
-      should begin with high-level books (from villager trading) rather than chaining smaller books.
-    </p>
-  </div>
+        <p>
+            When enchanting items in <span class="font-semibold text-white">Minecraft</span>, the order
+            in which you combine armor, weapons, and tools with books in your anvil makes a
+            <span class="font-semibold text-white">huge difference</span>. Each time you work on an anvil,
+            you increase the <span class="font-semibold text-white">work penalty</span>. Once that penalty
+            gets too high, you simply can't add any more enchantments and the anvil says
+            “<span class="font-semibold text-white">Too Expensive</span>!”.
+            This planner finds the <span class="font-semibold text-white">optimal sequence</span> of
+            book combinations to keep your <span class="font-semibold text-white">XP cost</span> as low as possible.
+        </p>
+        <p>
+            This tool assumes your gear and books start with
+            <span class="font-semibold text-white">zero work penalty</span>. In other words, you haven’t
+            previously merged lower-level books (e.g. two Level 1 → Level 2) or used the anvil on that
+            item. To achieve <span class="font-semibold text-white">max-level enchantments</span> you
+            should begin with high-level books (from villager trading) rather than chaining smaller books.
+        </p>
+        <p>
+            Steps on how to use:
+            1. Pick an item from the drop‑down.
+            2. Click the level buttons to describe current and desired enchantments.
+            3. Choose whether you care about the least total levels or least prior‑work, then click calculate.
+            4. Follow the step‑by‑step plan shown at the bottom of the page
+        </p>
+    </div>
 
     <form id="planner-form" method="post" action="{{ url_for('calculate') }}" class="flex flex-col gap-12">
-        <!-- Item Picker -->
         <section class="flex flex-col gap-4 max-w-md mx-auto">
             <h2 class="text-lg font-semibold">1. Choose your item</h2>
             <label class="relative w-full">
@@ -47,10 +53,8 @@
             </label>
         </section>
 
-        <!-- Current & Desired Panels -->
         <div id="dynamic-area" class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14"></div>
 
-        <!-- Optimisation Mode -->
         <section id="mode-block" class="hidden flex flex-col gap-6">
             <h2 class="text-lg font-semibold">4. Optimize for…</h2>
             <div class="flex flex-wrap gap-6">
@@ -71,7 +75,6 @@
     <div id="result-block" class="scroll-mt-24 space-y-8"></div>
 
     <style>
-        /* Panel */
         .ench-container {
             background-color: #1e2535;
             border: 1px solid #334155;
@@ -80,14 +83,12 @@
             box-shadow: 0 1px 3px rgb(0 0 0 / .25);
         }
 
-        /* no max‑height => no scrollbar */
         .ench-container h3 {
             font-size: .875rem;
             font-weight: 600;
             margin-bottom: 1rem;
         }
 
-        /* Rows */
         .ench-row {
             display: flex;
             align-items: center;
@@ -99,12 +100,10 @@
             background-color: #233047;
         }
 
-        /* dark bluish */
         .stripe-1 {
             background-color: #1d283a;
         }
 
-        /* slightly darker */
         .ench-row.disabled-row {
             opacity: .3;
             pointer-events: none;
@@ -144,7 +143,6 @@
             background-color: rgba(59, 130, 246, .25);
         }
 
-        /* hover tint */
         .level-btn.selected {
             background-color: #3b82f6;
             border-color: #3b82f6;
@@ -194,7 +192,6 @@
             }
 
             const applicable = ENCHANTS.filter(([ns, m]) => m.items.includes(item));
-            // 1) same BFS grouping, but only on non-curse enchants:
             const curses = ['curse_of_binding', 'curse_of_vanishing'];
             const nonCurses = applicable
                 .map(([ns]) => ns)
@@ -229,7 +226,7 @@
                 wrap.className = 'ench-container';
                 wrap.innerHTML = `<h3>${title}</h3>`;
                 if (key === 'cur') wrap.innerHTML += `<label class="inline-flex items-center gap-2 mb-4 text-sm">Anvil Use Count: <input type="number" name="prior_work" min="0" max="39" value="0"></label>`;
-                let stripe = 0; // alternate per incompat group
+                let stripe = 0;
                 groups.forEach(g => {
                     g.forEach(ns => {
                         const meta = ENCHANTS.find(([n]) => n === ns)[1];
@@ -255,7 +252,7 @@
                         }
                         wrap.appendChild(row);
                     });
-                    stripe = 1 - stripe; // switch colour for next incompat group
+                    stripe = 1 - stripe;
                 });
                 dyn.appendChild(wrap);
             });

@@ -261,15 +261,14 @@ def check_item_can_have(enchant_ns: str, item_type: str) -> bool:
 
 
 def is_compatible(chosen: Dict[str, int]) -> Tuple[bool, List[Tuple[str, str]]]:
-    """Return (ok, list_of_conflicts)."""
     conflicts: List[Tuple[str, str]] = []
     for a, b in itertools.combinations(chosen.keys(), 2):
         if a in ENCHANTMENTS[b]["incompatible"] or b in ENCHANTMENTS[a]["incompatible"]:
             conflicts.append((a, b))
     return len(conflicts) == 0, conflicts
 
+
 class InvalidTarget(Exception):
-    """Book may not be used as an anvil *target* when the sacrifice isn’t a book."""
     pass
 
 
@@ -301,7 +300,7 @@ class EnchantedItem:
         return EnchantedItem("book", {ns: level})
 
     def prior_penalty(self) -> int:
-        return (1 << self.anvil_uses) - 1  # 2^n - 1
+        return (1 << self.anvil_uses) - 1
 
     def merge_cost_levels(self, other: "EnchantedItem", rename: bool = False, repair: bool = False) -> int:
         cost = self.prior_penalty() + other.prior_penalty()
@@ -352,7 +351,6 @@ class EnchantedItem:
         else:
             core = self.item_type.capitalize()
 
-        # Books don’t show the prior‑work line
         if self.item_type == "book":
             return core
 
@@ -454,7 +452,8 @@ def plan_enchants(base: EnchantedItem, desired: Dict[str, int], *, mode: str = "
 
     solutions = _search(base, missing)
     if not solutions:
-        raise RuntimeError("Couldn’t find a valid anvil order – at least one merge would exceed 39 levels. Try removing an enchant or adding some to the base item.")
+        raise RuntimeError(
+            "Couldn’t find a valid anvil order – at least one merge would exceed 39 levels. Try removing an enchant or adding some to the base item.")
 
     if mode not in {"levels", "prior_work"}:
         raise ValueError("mode must be 'levels' or 'prior_work'")

@@ -1,12 +1,10 @@
 {% extends 'base.html' %}
 {% block body %}
 
-    <!-- ─────────────────────────── Result Heading ─────────────────────────── -->
     <h2 class="mb-8 text-center text-2xl font-extrabold tracking-tight text-brand">
         Optimal Anvil Sequence
     </h2>
 
-    <!-- ─────────────────────────── Steps (ordered) ─────────────────────────── -->
     <ol class="flex flex-col gap-6">
         {% for s in plan.steps %}
             <li class="relative pl-10">
@@ -14,8 +12,6 @@
                 <span class="absolute left-0 top-1/2 -translate-y-1/2 rounded-full bg-brand px-3 py-1 text-sm font-bold text-white shadow">
         {{ loop.index }}
       </span>
-
-                <!-- Step card -->
                 <article
                         class="rounded-lg border border-slate-700 bg-slate-800/70 p-4 shadow-card transition hover:bg-slate-700/60">
                     <p class="font-semibold leading-snug">
@@ -31,17 +27,16 @@
         {% endfor %}
     </ol>
 
-    <!-- ─────────────────────────── Totals Summary ─────────────────────────── -->
     <section class="mt-10 w-max rounded-lg border border-brand/40 bg-brand/10 p-5 text-slate-200 shadow-card">
         <h3 class="mb-2 text-lg font-bold text-brand-light">Totals</h3>
         <p class="text-xl font-extrabold">
-            {{ plan.total_levels }} levels <span class="text-brand text-base font-semibold">({{ plan.total_xp }} xp)</span>
+            {{ plan.total_levels }} levels <span
+                class="text-brand text-base font-semibold">({{ plan.total_xp }} xp)</span>
         </p>
         <p class="mt-1 text-sm">Final prior‑work penalty: <span
                 class="font-medium">{{ plan.final_prior_work }}</span></p>
     </section>
 
-    <!-- Back link -->
     <a href="/" class="mt-6 inline-block text-brand hover:underline">← Start over</a>
 
 {% endblock %}

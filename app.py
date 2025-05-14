@@ -1,4 +1,3 @@
-from pathlib import Path
 from flask import Flask, render_template, request, redirect, url_for, flash
 
 from enchantmentcalc import (
@@ -11,27 +10,20 @@ from enchantmentcalc import (
 )
 
 app = Flask(__name__)
-app.secret_key = "dev-key"  # change in production
+app.secret_key = "dev-key"
 
-# ---------------------------------------------------------------------------
-# Pre‑computed lists for the form -------------------------------------------
-# ---------------------------------------------------------------------------
 ITEM_TYPES = sorted({it for e in ENCHANTMENTS.values() for it in e["items"] if it != "book"})
-ALL_ENCHANTS = sorted(ENCHANTMENTS.items())  # list[(namespace, meta)]
+ALL_ENCHANTS = sorted(ENCHANTMENTS.items())
 
-
-# Helpers -------------------------------------------------------------------
 
 def parse_enchants(prefix: str):
     out = {}
     for ns, meta in ALL_ENCHANTS:
         raw = request.form.get(f"{prefix}-{ns}")
-        if raw and int(raw) > 0:  # non‑empty
+        if raw and int(raw) > 0:
             out[ns] = int(raw)
     return out
 
-
-# Routes --------------------------------------------------------------------
 
 @app.route("/")
 def index():
@@ -39,8 +31,8 @@ def index():
     return render_template(
         "index.html",
         items=ITEM_TYPES,
-        enchants=ALL_ENCHANTS,  # existing list of meta‑dicts
-        pretty_names=pretty  # <── NEW
+        enchants=ALL_ENCHANTS,
+        pretty_names=pretty
     )
 
 
@@ -64,7 +56,6 @@ def calculate():
                                              anvil_uses=prior_work)
         plan = plan_enchants(base_item, desired, mode=mode)
         return render_template("result.html", plan=plan)
-
 
     except (ValueError,
             IncompatibleSelected,
