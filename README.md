@@ -2,6 +2,10 @@
 
 *A tiny Flask + Vanilla‑JS web app that tells you the cheapest way to put **any** set of enchantments on any item in Minecraft (Java 1.20 +).*
 
+Available for use here!
+
+https://minecraft-enchantment-order.onrender.com
+
 ---
 
 ##  Features
