@@ -1,7 +1,29 @@
 {% extends 'base.html' %}
 {% block body %}
 
-    <h1 class="text-center text-3xl font-extrabold text-brand mb-12">Minecraft Enchant Planner</h1>
+    <h1 class="text-center text-3xl font-extrabold text-brand mb-4">
+        Minecraft Enchant Planner
+    </h1>
+
+    <div class="mx-auto max-w-3xl text-sm text-slate-300 space-y-4 mb-12">
+    <p>
+      When enchanting items in <span class="font-semibold text-white">Minecraft</span>, the order
+      in which you combine armor, weapons, and tools with books in your anvil makes a
+      <span class="font-semibold text-white">huge difference</span>. Each time you work on an anvil,
+      you increase the <span class="font-semibold text-white">work penalty</span>. Once that penalty
+      gets too high, you simply can't add any more enchantments and the anvil says
+      “<span class="font-semibold text-white">Too Expensive</span>!”.
+      This planner finds the <span class="font-semibold text-white">optimal sequence</span> of
+      book combinations to keep your <span class="font-semibold text-white">XP cost</span> as low as possible.
+    </p>
+    <p>
+      This tool assumes your gear and books start with
+      <span class="font-semibold text-white">zero work penalty</span>. In other words, you haven’t
+      previously merged lower-level books (e.g. two Level 1 → Level 2) or used the anvil on that
+      item. To achieve <span class="font-semibold text-white">max-level enchantments</span> you
+      should begin with high-level books (from villager trading) rather than chaining smaller books.
+    </p>
+  </div>
 
     <form id="planner-form" method="post" action="{{ url_for('calculate') }}" class="flex flex-col gap-12">
         <!-- Item Picker -->
@@ -202,11 +224,11 @@
                 }
             });
 
-            [['cur', '2. Current enchantments'], ['des', '3. Desired final enchantments']].forEach(([key, title]) => {
+            [['cur', '2. Current Enchantments'], ['des', '3. Desired final enchantments']].forEach(([key, title]) => {
                 const wrap = document.createElement('div');
                 wrap.className = 'ench-container';
                 wrap.innerHTML = `<h3>${title}</h3>`;
-                if (key === 'cur') wrap.innerHTML += `<label class="inline-flex items-center gap-2 mb-4 text-sm">Prior-work penalty: <input type="number" name="prior_work" min="0" max="39" value="0"></label>`;
+                if (key === 'cur') wrap.innerHTML += `<label class="inline-flex items-center gap-2 mb-4 text-sm">Anvil Use Count: <input type="number" name="prior_work" min="0" max="39" value="0"></label>`;
                 let stripe = 0; // alternate per incompat group
                 groups.forEach(g => {
                     g.forEach(ns => {
