@@ -1,36 +1,42 @@
 <!doctype html>
-<html lang=\"en\">
+<html lang="en">
 <head>
-    <meta charset=\"utf-8\">
+    <meta charset="utf-8">
     <title>Minecraft Enchant Planner</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            margin: 2rem;
-            max-width: 960px
-        }
 
-        table, th, td {
-            border: 1px solid #888;
-            border-collapse: collapse;
-            padding: 4px
+    <!-- Tailwind CDN + typography plugin -->
+    <!-- tailwind dark‑mode, JIT compiled in the browser -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'media',          // auto dark‑mode
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {DEFAULT: '#3b82f6', light: '#93c5fd'},
+                        surface: {DEFAULT: '#1e293b', light: '#f8fafc'},
+                    },
+                    boxShadow: {card: '0 1px 3px rgb(0 0 0 / .12)'}
+                }
+            }
         }
-
-        th {
-            background: #eee
-        }
-
-        .warn {
-            color: #c00
-        }
-    </style>
+    </script>
 </head>
-<body>
-{% with msgs = get_flashed_messages() %}
-    {% if msgs %}
-        <ul class=warn>{% for m in msgs %}
-            <li>{{ m }}</li>{% endfor %}</ul>{% endif %}
-{% endwith %}
-{% block body %}{% endblock %}
+
+<body class="min-h-screen bg-surface-light dark:bg-surface text-slate-900 dark:text-slate-200
+             selection:bg-brand/50 selection:text-white">
+
+<main class="mx-auto max-w-5xl px-6 py-8 space-y-10">
+    {% with msgs = get_flashed_messages() %}
+        {% if msgs %}
+            <ul class="px-4 py-3 rounded-lg bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                {% for m in msgs %}
+                    <li>{{ m }}</li>{% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    {% block body %}{% endblock %}
+</main>
 </body>
 </html>

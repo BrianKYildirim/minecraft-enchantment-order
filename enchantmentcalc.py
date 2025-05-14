@@ -435,7 +435,7 @@ def plan_enchants(base: EnchantedItem, desired: Dict[str, int], *, mode: str = "
 
     solutions = _search(base, missing)
     if not solutions:
-        raise RuntimeError("No valid anvil ordering found (all merges > 39 levels?)")
+        raise RuntimeError("Couldn’t find a valid anvil order – at least one merge would exceed 39 levels. Try removing an enchant or adding some to the base item.")
 
     if mode not in {"levels", "prior_work"}:
         raise ValueError("mode must be 'levels' or 'prior_work'")

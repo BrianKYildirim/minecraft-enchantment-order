@@ -29,6 +29,7 @@ def parse_enchants(prefix: str):
             out[ns] = int(raw)
     return out
 
+
 # Routes --------------------------------------------------------------------
 
 @app.route("/")
@@ -57,9 +58,12 @@ def calculate():
         plan = plan_enchants(base_item, desired, mode=mode)
         return render_template("result.html", plan=plan)
 
-    except (ValueError, IncompatibleSelected, MergeTooExpensive) as e:
-        flash(str(e))
-        return redirect(url_for("index"))
+
+    except (ValueError,
+            IncompatibleSelected,
+            MergeTooExpensive,
+            RuntimeError,) as e:
+        return str(e), 400
 
 
 if __name__ == "__main__":

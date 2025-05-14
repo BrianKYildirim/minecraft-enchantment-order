@@ -1,60 +1,150 @@
 {% extends 'base.html' %}
 {% block body %}
-    <h1><a href=\"/\">Minecraft Enchant Planner</a></h1>
-    <form id="planner-form" method="post" action="{{ url_for('calculate') }}">
-        <h2>1. Choose your item</h2>
-        <select id="item-select" name="item_type" required>
-            <option value="" disabled selected>-- pick item --</option>
-            {% for it in items %}
-                <option value="{{ it }}">{{ it|replace('_',' ')|title }}</option>{% endfor %}
-        </select>
 
-        <!-- blocks are injected dynamically -->
-        <div id="dynamic-area"></div>
+    <h1 class="text-center text-3xl font-extrabold text-brand mb-12">Minecraft Enchant Planner</h1>
 
-        <div id="mode-block" style="display:none;margin-top:1rem;">
-            <h2>4. Optimize for…</h2>
-            <label><input type="radio" name="mode" value="levels" checked> Least total levels</label>
-            <label><input type="radio" name="mode" value="prior_work"> Least prior‑work penalty</label>
-            <p>
-                <button type="submit">Calculate&nbsp;Plan</button>
-            </p>
-        </div>
+    <form id="planner-form" method="post" action="{{ url_for('calculate') }}" class="flex flex-col gap-12">
+        <!-- Item Picker -->
+        <section class="flex flex-col gap-4 max-w-md mx-auto">
+            <h2 class="text-lg font-semibold">1. Choose your item</h2>
+            <label class="relative w-full">
+                <select id="item-select" name="item_type"
+                        class="peer w-full rounded-lg border border-slate-700 bg-slate-800/80 px-4 py-2 pr-10 text-sm text-slate-100 shadow focus:border-brand focus:ring-2 focus:ring-brand">
+                    <option value="" disabled selected>— pick item —</option>
+                    {% for it in items %}
+                        <option value="{{ it }}">{{ it|replace('_',' ')|title }}</option>
+                    {% endfor %}
+                </select>
+                <svg class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 peer-focus:text-brand"
+                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </label>
+        </section>
+
+        <!-- Current & Desired Panels -->
+        <div id="dynamic-area" class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14"></div>
+
+        <!-- Optimisation Mode -->
+        <section id="mode-block" class="hidden flex flex-col gap-6">
+            <h2 class="text-lg font-semibold">4. Optimise for…</h2>
+            <div class="flex flex-wrap gap-6">
+                <label class="inline-flex items-center gap-2"><input type="radio" name="mode" value="levels"
+                                                                     class="accent-brand" checked>Least total
+                    levels</label>
+                <label class="inline-flex items-center gap-2"><input type="radio" name="mode" value="prior_work"
+                                                                     class="accent-brand">Least prior-work
+                    penalty</label>
+            </div>
+            <button type="submit"
+                    class="self-start rounded-lg bg-brand px-6 py-2 font-semibold text-white shadow hover:bg-brand/90 focus:ring-2 focus:ring-brand transition">
+                Calculate Plan
+            </button>
+        </section>
     </form>
 
-    <!-- result injected here -->
-    <div id="result-block" style="display:none;margin-top:2rem;"></div>
+    <div id="result-block" class="scroll-mt-24 space-y-8"></div>
 
     <style>
-        .strip0 { background:#fff; }
-        .strip1 { background: #d4d4d4; }
-        .group-title {
-            font-weight: bold;
-            background: #f0f0f0;
-            padding: 2px 4px;
-            margin-top: 0.5rem;
+        /* Panel */
+        .ench-container {
+            background-color: #1e2535;
+            border: 1px solid #334155;
+            border-radius: .75rem;
+            padding: 1rem;
+            box-shadow: 0 1px 3px rgb(0 0 0 / .25);
         }
 
+        /* no max‑height => no scrollbar */
+        .ench-container h3 {
+            font-size: .875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        /* Rows */
         .ench-row {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            margin: 0px 0;
-            padding:2px 0;
+            gap: 1rem;
+            padding: .5rem 1rem;
         }
-        .ench-row.disabled-row { opacity:.4; }
 
-        .level-btn { padding:2px 6px; border:1px solid #666; background:#fafafa; cursor:pointer }
-        .level-btn.selected { background:#8cf }
-        .level-btn:disabled { opacity:.3; cursor:not-allowed }
+        .stripe-0 {
+            background-color: #233047;
+        }
 
-        .disabled-row {
-            opacity: 0.4;
+        /* dark bluish */
+        .stripe-1 {
+            background-color: #1d283a;
+        }
+
+        /* slightly darker */
+        .ench-row.disabled-row {
+            opacity: .3;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .ench-name {
+            width: 160px;
+            font-weight: 500;
+            font-size: .875rem;
+            color: #e2e8f0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .level-cell {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+        }
+
+        .level-btn {
+            width: 2rem;
+            height: 2rem;
+            display: grid;
+            place-content: center;
+            border: 1px solid #475569;
+            background-color: #0f172a;
+            font-size: .75rem;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: .15s background-color;
+        }
+
+        .level-btn:hover {
+            background-color: rgba(59, 130, 246, .25);
+        }
+
+        /* hover tint */
+        .level-btn.selected {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+            color: #fff;
+        }
+
+        .level-btn:disabled {
+            opacity: .25;
+            cursor: not-allowed;
+        }
+
+        input[type=number] {
+            width: 5rem;
+            border: 1px solid #475569;
+            border-radius: .375rem;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            padding: .25rem .5rem;
+            text-align: center;
+            font-size: .875rem;
         }
     </style>
 
     <script>
-        const ENCHANTS = {{ enchants|tojson }};   // list of [namespace, meta]
+        const ENCHANTS = {{ enchants|tojson }};
 
         function prettify(ns) {
             return ns.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
@@ -63,180 +153,138 @@
         const form = document.getElementById('planner-form');
         const itemSel = document.getElementById('item-select');
         const dyn = document.getElementById('dynamic-area');
-        const modeBlock = document.getElementById('mode-block');
-        const resultBlock = document.getElementById('result-block');
+        const modeBlk = document.getElementById('mode-block');
+        const resBlk = document.getElementById('result-block');
+        let curInputs = {}, desInputs = {};
 
-        let curInputs = {}, desInputs = {}; // map ns -> hidden input element
-
-        itemSel.addEventListener('change', () => {
-            buildTables(itemSel.value);
-        });
+        itemSel.addEventListener('change', () => buildTables(itemSel.value));
 
         function buildTables(item) {
             dyn.innerHTML = '';
-            resultBlock.style.display = 'none';
+            resBlk.style.display = 'none';
             if (!item) {
-                modeBlock.style.display = 'none';
+                modeBlk.classList.add('hidden');
                 return;
             }
 
-            // filter applicable enchants
-            const applicable = ENCHANTS.filter(([ns, meta]) => meta.items.includes(item));
-
-            // create incompatibility graph and groups
+            const applicable = ENCHANTS.filter(([ns, m]) => m.items.includes(item));
+            // Build incompatibility groups (transitively)
             const remaining = new Set(applicable.map(([ns]) => ns));
             const groups = [];
             while (remaining.size) {
-                const ns = [...remaining][0];
-                const group = new Set();
-                const queue = [ns];
-                while (queue.length) {
-                    const x = queue.pop();
+                const root = [...remaining][0];
+                const q = [root];
+                const g = new Set();
+                while (q.length) {
+                    const x = q.pop();
                     if (!remaining.has(x)) continue;
                     remaining.delete(x);
-                    group.add(x);
-                    const inc = ENCHANTS.find(([n]) => n === x)[1].incompatible;
-                    inc.forEach(y => {
-                        if (remaining.has(y)) queue.push(y);
-                    });
+                    g.add(x);
+                    ENCHANTS.find(([n]) => n === x)[1].incompatible.forEach(i => remaining.has(i) && q.push(i));
                 }
-                groups.push([...group]);
+                groups.push([...g]);
             }
 
-            // build two sections (current & desired)
-            ['cur', 'des'].forEach(section => {
-                const block = document.createElement('div');
-                block.id = section + '-block';
-                block.innerHTML = `<h2 style="display:flex;align-items:center;gap:.5rem">
-                    ${section === 'cur'
-                    ? '2. Current enchantments on that item'
-                    : '3. Desired final enchantments'}${section === 'cur'
-                    ? '<label style="font-weight:400;margin-left:auto">Prior Work Penalty: <input type="number" name="prior_work" min="0" max="39" value="0" style="width:4rem"></label>'
-                    : ''}</h2>`;
-
-                let stripe=0;                       // 0 = light, 1 = dark
-                groups.forEach(g=>{
-                    g.forEach(ns=>{
-                        const meta=ENCHANTS.find(([n])=>n===ns)[1];
-                        const row=document.createElement('div');
-                        row.className=`ench-row strip${stripe}`;
-                        row.dataset.ns=ns;
-                        row.dataset.incompat=meta.incompatible.join(',');
-                        row.innerHTML=`<span style="width:160px">${prettify(ns)}</span>`;
-
-                        /* hidden input */
-                        const h=document.createElement('input');
-                        h.type='hidden'; h.name=`${section}-${ns}`;
-                        row.appendChild(h);
-                        if(section==='cur') curInputs[ns]=h; else desInputs[ns]=h;
-
-                        /* level buttons */
-                        for(let lv=1;lv<=meta.levelMax;lv++){
-                            const b=document.createElement('button');
-                            b.type='button'; b.textContent=lv; b.className='level-btn'; b.dataset.level=lv;
-                            b.addEventListener('click',()=>toggle(b,h,row));
-                            row.appendChild(b);
+            // panels
+            [['cur', '2. Current enchantments'], ['des', '3. Desired final enchantments']].forEach(([key, title]) => {
+                const wrap = document.createElement('div');
+                wrap.className = 'ench-container';
+                wrap.innerHTML = `<h3>${title}</h3>`;
+                if (key === 'cur') wrap.innerHTML += `<label class="inline-flex items-center gap-2 mb-4 text-sm">Prior-work penalty: <input type="number" name="prior_work" min="0" max="39" value="0"></label>`;
+                let stripe = 0; // alternate per incompat group
+                groups.forEach(g => {
+                    g.forEach(ns => {
+                        const meta = ENCHANTS.find(([n]) => n === ns)[1];
+                        const row = document.createElement('div');
+                        row.className = `ench-row stripe-${stripe}`;
+                        row.dataset.ns = ns;
+                        row.dataset.incompat = meta.incompatible.join(',');
+                        row.innerHTML = `<span class="ench-name">${prettify(ns)}</span><div class="level-cell"></div>`;
+                        const cell = row.querySelector('.level-cell');
+                        const hidden = document.createElement('input');
+                        hidden.type = 'hidden';
+                        hidden.name = `${key}-${ns}`;
+                        row.appendChild(hidden);
+                        key === 'cur' ? curInputs[ns] = hidden : desInputs[ns] = hidden;
+                        for (let lv = 1; lv <= meta.levelMax; lv++) {
+                            const b = document.createElement('button');
+                            b.type = 'button';
+                            b.textContent = lv;
+                            b.className = 'level-btn';
+                            b.dataset.level = lv;
+                            b.addEventListener('click', () => toggle(b, hidden, row));
+                            cell.appendChild(b);
                         }
-                        block.appendChild(row);
+                        wrap.appendChild(row);
                     });
-                    stripe = 1 - stripe;
+                    stripe = 1 - stripe; // switch colour for next incompat group
                 });
-                dyn.appendChild(block);
+                dyn.appendChild(wrap);
             });
-            modeBlock.style.display = 'block';
+            modeBlk.classList.remove('hidden');
         }
 
-        function clearRow(row) {
-            row.querySelectorAll('.level-btn.selected')
-                .forEach(b => b.classList.remove('selected'));
-            row.querySelector('input[type="hidden"]').value = '';
+        function clearRow(r) {
+            r.querySelectorAll('.level-btn.selected').forEach(b => b.classList.remove('selected'));
+            r.querySelector('input[type="hidden"]').value = '';
         }
 
         function toggle(btn, hidden, row) {
-            // Same button again → clear
             if (btn.classList.contains('selected')) {
                 clearRow(row);
                 updateDisable();
                 return;
             }
-
-            // Choose this level
             clearRow(row);
             btn.classList.add('selected');
             hidden.value = btn.dataset.level;
-
-            // Clear every incompatible row
             row.dataset.incompat.split(',').filter(Boolean).forEach(ns => {
-                const r = document.querySelector(`.ench-row[data-ns=\"${ns}\"]`);
-                if (r) clearRow(r);
+                const rr = document.querySelector(`.ench-row[data-ns="${ns}"]`);
+                rr && clearRow(rr);
             });
-
             updateDisable();
             updateDesiredLock();
         }
 
         function updateDisable() {
-            const selectedNS = new Set();
-            document.querySelectorAll('.ench-row').forEach(row => {
-                const ns = row.dataset.ns;
-                const active = row.querySelector('.level-btn.selected');
-                if (active) selectedNS.add(ns);
+            const sel = new Set([...document.querySelectorAll('.level-btn.selected')].map(b => b.closest('.ench-row').dataset.ns));
+            const dis = new Set();
+            sel.forEach(ns => ENCHANTS.find(([n]) => n === ns)[1].incompatible.forEach(i => dis.add(i)));
+            document.querySelectorAll('.ench-row').forEach(r => {
+                const ns = r.dataset.ns;
+                const keep = r.querySelector('.level-btn.selected');
+                const off = (dis.has(ns) || sel.has(ns)) && !keep;
+                r.classList.toggle('disabled-row', off);
+                r.querySelectorAll('.level-btn').forEach(b => b.disabled = off);
             });
-            const disableSet = new Set();
-            selectedNS.forEach(ns => {
-                const inc = document.querySelector(`.ench-row[data-ns='${ns}']`).dataset.incompat.split(',').filter(Boolean);
-                inc.forEach(x => disableSet.add(x));
-            });
-            document.querySelectorAll('.ench-row').forEach(row => {
-                const ns = row.dataset.ns;
-                const isDisabled =
-                    (disableSet.has(ns) ||
-                        selectedNS.has(ns))
-                    && !row.querySelector('.level-btn.selected');
-                row.classList.toggle('disabled-row', isDisabled);
-                row.querySelectorAll('.level-btn').forEach(btn => btn.disabled = isDisabled);
-            });
-
-            updateDesiredLock();
         }
 
         function updateDesiredLock() {
-            /* collect every namespace that is currently selected anywhere */
-            const selected = new Set(
-                [...document.querySelectorAll('.level-btn.selected')]
-                    .map(btn => btn.closest('.ench-row').dataset.ns)
-            );
-
-            /* everything incompatible with any selected ns */
-            const blocked = new Set(selected);
-            selected.forEach(ns => {
-                const inc = document.querySelector(`.ench-row[data-ns='${ns}']`)
-                    ?.dataset.incompat.split(',').filter(Boolean) || [];
-                inc.forEach(x => blocked.add(x));
-            });
-
-            /* grey‑out+disable rows inside DES block, unless they themselves are chosen */
-            document.querySelectorAll('#des-block .ench-row').forEach(row => {
-                const ns = row.dataset.ns;
-                const keep = row.querySelector('.level-btn.selected'); // chosen in Desired
-                const off = blocked.has(ns) && !keep;
-                row.classList.toggle('disabled-row', off);
-                row.querySelectorAll('.level-btn').forEach(b => b.disabled = off);
+            const sel = new Set([...document.querySelectorAll('.level-btn.selected')].map(b => b.closest('.ench-row').dataset.ns));
+            const blk = new Set(sel);
+            sel.forEach(ns => ENCHANTS.find(([n]) => n === ns)[1].incompatible.forEach(i => blk.add(i)));
+            document.querySelectorAll('#dynamic-area > div:nth-child(2) .ench-row').forEach(r => {
+                const ns = r.dataset.ns;
+                const keep = r.querySelector('.level-btn.selected');
+                const off = blk.has(ns) && !keep;
+                r.classList.toggle('disabled-row', off);
+                r.querySelectorAll('.level-btn').forEach(b => b.disabled = off);
             });
         }
 
-        // Ajax submit to keep result on same page ---------------------------------
         form.addEventListener('submit', e => {
             e.preventDefault();
-            const formData = new FormData(form);
-            fetch(form.action, {method: 'POST', body: formData})
-                .then(r => r.text())
-                .then(html => {
-                    resultBlock.innerHTML = html;
-                    resultBlock.style.display = 'block';
-                    resultBlock.scrollIntoView({behavior: 'smooth'});
-                })
-                .catch(err => alert(err));
+            const fd = new FormData(form);
+            fetch(form.action, {
+                method: 'POST',
+                body: fd
+            }).then(r => r.redirected ? window.location = r.url : r.text()).then(html => {
+                if (!html) return;
+                resBlk.innerHTML = html;
+                resBlk.style.display = 'block';
+                resBlk.scrollIntoView({behavior: 'smooth'});
+            });
         });
     </script>
+
 {% endblock %}
