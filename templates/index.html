@@ -27,7 +27,7 @@
 
         <!-- Optimisation Mode -->
         <section id="mode-block" class="hidden flex flex-col gap-6">
-            <h2 class="text-lg font-semibold">4. Optimise for…</h2>
+            <h2 class="text-lg font-semibold">4. Optimize for…</h2>
             <div class="flex flex-wrap gap-6">
                 <label class="inline-flex items-center gap-2"><input type="radio" name="mode" value="levels"
                                                                      class="accent-brand" checked>Least total
@@ -145,9 +145,10 @@
 
     <script>
         const ENCHANTS = {{ enchants|tojson }};
+        const NAMES = {{ pretty_names|tojson }}
 
         function prettify(ns) {
-            return ns.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+            return NAMES[ns] || ns;
         }
 
         const form = document.getElementById('planner-form');
@@ -168,24 +169,36 @@
             }
 
             const applicable = ENCHANTS.filter(([ns, m]) => m.items.includes(item));
-            // Build incompatibility groups (transitively)
-            const remaining = new Set(applicable.map(([ns]) => ns));
-            const groups = [];
+            // 1) same BFS grouping, but only on non-curse enchants:
+            const curses = ['curse_of_binding', 'curse_of_vanishing'];
+            const nonCurses = applicable
+                .map(([ns]) => ns)
+                .filter(ns => !curses.includes(ns));
+
+            const remaining = new Set(nonCurses);
+            let groups = [];
             while (remaining.size) {
                 const root = [...remaining][0];
-                const q = [root];
-                const g = new Set();
-                while (q.length) {
-                    const x = q.pop();
+                const queue = [root], group = new Set();
+                while (queue.length) {
+                    const x = queue.pop();
                     if (!remaining.has(x)) continue;
                     remaining.delete(x);
-                    g.add(x);
-                    ENCHANTS.find(([n]) => n === x)[1].incompatible.forEach(i => remaining.has(i) && q.push(i));
+                    group.add(x);
+                    ENCHANTS.find(([n]) => n === x)[1].incompatible
+                        .forEach(i => remaining.has(i) && queue.push(i));
                 }
-                groups.push([...g]);
+                groups.push([...group]);
             }
 
-            // panels
+            groups.sort((a, b) => b.length - a.length);
+
+            curses.forEach(c => {
+                if (applicable.some(([ns]) => ns === c)) {
+                    groups.push([c]);
+                }
+            });
+
             [['cur', '2. Current enchantments'], ['des', '3. Desired final enchantments']].forEach(([key, title]) => {
                 const wrap = document.createElement('div');
                 wrap.className = 'ench-container';

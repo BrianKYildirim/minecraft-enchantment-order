@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 
 from enchantmentcalc import (
     ENCHANTMENTS,
+    _pretty_name,
     EnchantedItem,
     plan_enchants,
     IncompatibleSelected,
@@ -34,7 +35,13 @@ def parse_enchants(prefix: str):
 
 @app.route("/")
 def index():
-    return render_template("index.html", items=ITEM_TYPES, enchants=ALL_ENCHANTS)
+    pretty = {ns: _pretty_name(ns) for ns in ENCHANTMENTS}
+    return render_template(
+        "index.html",
+        items=ITEM_TYPES,
+        enchants=ALL_ENCHANTS,  # existing list of meta‑dicts
+        pretty_names=pretty  # <── NEW
+    )
 
 
 @app.route("/calculate", methods=["POST"])

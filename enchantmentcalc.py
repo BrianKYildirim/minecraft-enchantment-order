@@ -31,18 +31,6 @@ ENCHANTMENTS: Dict[str, Dict] = {
          "weight": 4,
          "incompatible": ["riptide"],
          "items": ["trident"]},
-    "curse_of_binding":
-        {"levelMax": 1,
-         "weight": 4,
-         "incompatible": [],
-         "items": ["helmet", "chestplate", "leggings", "boots", "elytra", "pumpkin", "helmet", "turtle_shell"]},
-    "curse_of_vanishing":
-        {"levelMax": 1,
-         "weight": 4,
-         "incompatible": [],
-         "items": ["helmet", "chestplate", "leggings", "boots", "pickaxe", "shovel", "axe", "sword", "hoe", "brush",
-                   "fishing_rod", "bow", "shears", "flint_and_steel", "carrot_on_a_stick", "warped_fungus_on_a_stick",
-                   "shield", "elytra", "pumpkin", "helmet", "trident", "turtle_shell", "crossbow", "mace"]},
     "denisty":
         {"levelMax": 5,
          "weight": 1,
@@ -222,9 +210,36 @@ ENCHANTMENTS: Dict[str, Dict] = {
          "weight": 2,
          "incompatible": [],
          "items": ["mace"]},
+    "curse_of_binding":
+        {"levelMax": 1,
+         "weight": 4,
+         "incompatible": [],
+         "items": ["helmet", "chestplate", "leggings", "boots", "elytra", "pumpkin", "helmet", "turtle_shell"]},
+    "curse_of_vanishing":
+        {"levelMax": 1,
+         "weight": 4,
+         "incompatible": [],
+         "items": ["helmet", "chestplate", "leggings", "boots", "pickaxe", "shovel", "axe", "sword", "hoe", "brush",
+                   "fishing_rod", "bow", "shears", "flint_and_steel", "carrot_on_a_stick", "warped_fungus_on_a_stick",
+                   "shield", "elytra", "pumpkin", "helmet", "trident", "turtle_shell", "crossbow", "mace"]},
 }
 
 MAX_MERGE_LEVELS = 39
+
+_IGNORE_LOWER = {"of"}
+_SPECIAL = {
+    "sweeping": "Sweeping Edge",
+}
+
+
+def _pretty_name(ns: str) -> str:
+    if ns in _SPECIAL:
+        return _SPECIAL[ns]
+    words = ns.split("_")
+    return " ".join(
+        w.capitalize() if w not in _IGNORE_LOWER else w
+        for w in words
+    )
 
 
 def xp_from_levels(levels: int) -> int:
@@ -328,16 +343,20 @@ class EnchantedItem:
                 cost_levels, cost_xp)
 
     def pretty(self) -> str:
-        if self.item_type == "book":
+        if self.enchants:
             ench_txt = ", ".join(
-                f"{ns.capitalize()} {lv}" for ns, lv in sorted(self.enchants.items())
+                f"{_pretty_name(ns)}" + (f" {lv}" if ENCHANTMENTS[ns]['levelMax'] > 1 else "")
+                for ns, lv in sorted(self.enchants.items())
             )
-            return f"Book ({ench_txt.capitalize().replace("_", " ")})"
+            core = f"{self.item_type.capitalize()} ({ench_txt})"
+        else:
+            core = self.item_type.capitalize()
 
-        ench_txt = ", ".join(
-            f"{ns.capitalize()} {lv}" for ns, lv in sorted(self.enchants.items())
-        )
-        return f"{self.item_type.capitalize()} ({ench_txt.capitalize()}) (Prior-work penalty = {self.anvil_uses})"
+        # Books don’t show the prior‑work line
+        if self.item_type == "book":
+            return core
+
+        return f"{core} (Prior‑work penalty = {self.anvil_uses})"
 
 
 class MergeTooExpensive(Exception):
