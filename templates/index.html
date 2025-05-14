@@ -9,8 +9,11 @@
             <h2 class="text-lg font-semibold">1. Choose your item</h2>
             <label class="relative w-full">
                 <select id="item-select" name="item_type"
-                        class="peer w-full rounded-lg border border-slate-700 bg-slate-800/80 px-4 py-2 pr-10 text-sm text-slate-100 shadow focus:border-brand focus:ring-2 focus:ring-brand">
-                    <option value="" disabled selected>— pick item —</option>
+                        class="peer appearance-none -webkit-appearance-none
+                        w-full rounded-lg border border-slate-700 bg-slate-800/80
+                        px-4 py-2 pr-10 text-sm text-slate-100 shadow
+                        focus:border-brand focus:ring-2 focus:ring-brand">
+                    <option value="" disabled selected>— Pick Item —</option>
                     {% for it in items %}
                         <option value="{{ it }}">{{ it|replace('_',' ')|title }}</option>
                     {% endfor %}
