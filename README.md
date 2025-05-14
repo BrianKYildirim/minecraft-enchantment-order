@@ -5,8 +5,9 @@
 ---
 
 ##  Features
-|                                                     | |
-|-----------------------------------------------------|--------------------------------------------------------------|
+
+| Capability                    | Description                                                                                                |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | **Optimal anvil ordering**                          | Finds the sequence with the lowest *total levels* **or** the smallest *prior‑work penalty* |
 | **Full 1.20 enchant data**                          | All vanilla items, all enchantments, weights, level caps & incompatibilities |
 | **Live validation**                                 | Impossible combinations are auto‑disabled and greyed‑out |
@@ -16,7 +17,7 @@
 
 ---
 
-## Quick‑start
+##  Quick Start
 
 ### 1 · Clone & install
 ```bash
@@ -41,7 +42,7 @@ python app.py        # default: http://127.0.0.1:5000
 
 ---
 
-## Project layout
+##  Project Layout
 
 ```
 .
@@ -56,7 +57,7 @@ python app.py        # default: http://127.0.0.1:5000
 
 ---
 
-## How the algorithm works
+##  How the algorithm works
 
 1. **Immutable `EnchantedItem` objects** record item‑type, enchants & prior‑work.
 2. A **recursive, memoised search** (`_cheapest_single`) tries every possible
