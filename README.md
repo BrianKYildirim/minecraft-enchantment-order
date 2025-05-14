@@ -17,6 +17,11 @@
 
 ---
 
+## Video Showcase
+
+https://github.com/user-attachments/assets/ca4885be-4280-4149-ac30-4c4ddadaa25a
+
+
 ##  Quick Start
 
 ### 1 · Clone & install
