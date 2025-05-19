@@ -1,23 +1,31 @@
-# Minecraft Enchant Planner
+# Minecraft Enchant Planner
 
-*A tiny Flask + Vanilla‑JS web app that tells you the cheapest way to put **any** set of enchantments on any item in Minecraft (Java 1.20 +).*
+*A tiny Flask + Vanilla-JS web app that tells you the cheapest way to put **any** set of enchantments on any item in Minecraft (Java 1.20 +).*
 
-Available for use here!
-
-https://minecraft-enchantment-order.onrender.com
+Available as a live demo here: https://minecraft-enchantment-order.onrender.com
 
 ---
 
-##  Features
+## Table of Contents
 
-| Capability                    | Description                                                                                                |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| **Optimal anvil ordering**                          | Finds the sequence with the lowest *total levels* **or** the smallest *prior‑work penalty* |
-| **Full 1.20 enchant data**                          | All vanilla items, all enchantments, weights, level caps & incompatibilities |
-| **Live validation**                                 | Impossible combinations are auto‑disabled and greyed‑out |
-| **Prior‑work input**                                | Enter an existing prior‑work penalty and it’s respected in the search |
-| **Instant results**                                 | Typical plans compute in ≲ 20 ms thanks to heavy memoization |
-| **No dependencies on the client**                   | Everything runs in one HTML file with vanilla JS |
+1. [Features](#features)
+2. [Video Showcase](#video-showcase) 
+3. [Quick Start](#quick-start)  
+4. [How It Works](#how-it-works)  
+5. [Project Structure](#project-structure)
+
+---
+
+## Features
+
+| Capability                   | Description                                                                                                   |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| **Optimal Anvil Ordering**   | Finds the sequence with the lowest *total levels* **or** the smallest *prior-work penalty*.                   |
+| **Full 1.20 Enchant Data**   | All vanilla items, all enchantments, weights, level caps & incompatibilities faithfully encoded.             |
+| **Live Validation**          | Impossible or incompatible combinations are auto-disabled and greyed-out in the UI.                           |
+| **Prior-Work Input**         | Enter an existing prior-work penalty (0–39) and it’s included in the optimization.                            |
+| **Instant Results**          | Typical plans compute in ≲ 20 ms thanks to heavy memoization and a pure-Python search.                        |
+| **Zero Client Dependencies** | Everything runs in one HTML file with vanilla JS—no frameworks or bundlers client-side.                      |
 
 ---
 
@@ -25,42 +33,81 @@ https://minecraft-enchantment-order.onrender.com
 
 https://github.com/user-attachments/assets/037b5237-23fe-40de-b5e3-ec3a6a344c9c
 
+---
 
-##  Quick Start
+## Quick Start
 
-### 1 · Clone & install
+### 1. Clone and Install
+
+*Though this project is hosted on Render, feel free to clone and run it locally!*
+
 ```bash
 git clone https://github.com/BrianKYildirim/minecraft-enchantment-order.git
 cd minecraft-enchantment-order
-python -m venv .venv && .venv\Scripts\activate.bat
+python -m venv .venv
+.venv\Scripts\activate.bat
 pip install -r requirements.txt
 ````
 
-### 2 · Run
+### 2. Run Locally
 
 ```bash
-python run.py        # default: http://127.0.0.1:5000
+python run.py
 ```
 
-### 3 · Enjoy
+### 3. Use
 
-1. Pick an item from the drop‑down.
-2. Click the level buttons to describe **current** and **desired** enchantments.
-3. Choose whether you care about *least total levels* or *least prior‑work*, then **Calculate**.
-4. Follow the step‑by‑step plan shown at the bottom of the page 
+1. **Pick** an item from the drop-down.
+2. **Set** your current enchantments (and prior-work).
+3. **Select** desired enchantments.
+4. **Choose** optimization mode (levels or prior-work).
+5. **Calculate** and follow the step-by-step plan.
+
+---
+
+## How It Works
+
+1. **Immutable models**
+
+   * `EnchantedItem` encapsulates item type, enchant levels, and prior-work uses.
+2. **Recursive, memoized search**
+
+   * `_cheapest_single(...)` tries every bipartition of `(base + books)`, merges sub-results, and tracks the best plan per resulting prior-work.
+3. **Vanilla anvil rules**
+
+   * Merge cost, level stacking, incompatibilities, and the hard 39-level cap are enforced in `EnchantedItem.merge()`.
+4. **Flexible optimization**
+
+   * You can minimize **total levels** or final **prior-work penalty**, with tie-breakers on the other metric.
 
 ---
 
-##  How the algorithm works
+## Project Structure
 
-1. **Immutable `EnchantedItem` objects** record item‑type, enchants & prior‑work.
-2. A **recursive, memoized search** (`_cheapest_single`) tries every possible
-   bipartition of the input books + base item, merges the cheapest sub‑results
-   and remembers the best plan for each resulting prior‑work value.
-3. Vanilla anvil rules (merge cost, level stacking, incompatibilities, the
-   hard 39‑level cap, etc.) are faithfully reproduced in
-   `EnchantedItem.merge()`.
-4. The user can choose to optimize either
-   *Σ levels* **or** final *prior‑work penalty* (ties broken by the other metric).
+```
+minecraft-enchantment-order/
+├── app/                    # Flask application package
+│   ├── static/             # Static assets
+│      ├── favicon.ico
+│      └── planner.js       # Frontend logic
+│   ├── templates/          # Jinja2 templates
+│      ├── base.html
+│      ├── index.html
+│      └── result.html
+│   ├── __init__.py         # App factory & config
+│   ├── routes.py           # Blueprint routes
+│   └── errors.py           # Error handlers
+├── enchantplanner/         # Core enchantment logic
+│   ├── data.py             # Enchantments metadata
+│   ├── utils.py            # Helpers (xp formula, naming, compat)
+│   ├── exceptions.py       # Custom exceptions
+│   ├── models.py           # EnchantedItem, Step, MergePlan
+│   └── calculator.py       # plan_enchants & search algorithm
+├── run.py                  # Launch script
+├── README.md
+└── requirements.txt
+```
 
 ---
+
+*Happy enchanting!*
