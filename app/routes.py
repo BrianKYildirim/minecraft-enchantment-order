@@ -1,3 +1,4 @@
+import os
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, send_from_directory
 
 from enchantplanner.data import ENCHANTMENTS
