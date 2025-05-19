@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% block body %}
+
+    <h1 class="text-center text-3xl font-extrabold text-brand mb-4">
+        Minecraft Enchant Planner
+    </h1>
+
+    <div class="mx-auto max-w-3xl text-sm text-slate-300 space-y-4 mb-12">
+        <p>
+            When enchanting items in <span class="font-semibold text-white">Minecraft</span>, the order
+            in which you combine armor, weapons, and tools with books in your anvil makes a
+            <span class="font-semibold text-white">huge difference</span>. Each time you work on an anvil,
+            you increase the <span class="font-semibold text-white">work penalty</span>. Once that penalty
+            gets too high, you simply can't add any more enchantments and the anvil says
+            “<span class="font-semibold text-white">Too Expensive</span>!”.
+            This planner finds the <span class="font-semibold text-white">optimal sequence</span> of
+            book combinations to keep your <span class="font-semibold text-white">XP cost</span> as low as possible.
+        </p>
+        <p>
+            This tool assumes your gear and books start with
+            <span class="font-semibold text-white">zero work penalty</span>. In other words, you haven’t
+            previously merged lower-level books (e.g. two Level 1 → Level 2) or used the anvil on that
+            item. To achieve <span class="font-semibold text-white">max-level enchantments</span> you
+            should begin with high-level books (from villager trading) rather than chaining smaller books.
+        </p>
+        <p>
+            Steps on how to use:<br>
+            &emsp;1. Pick an item from the drop‑down.<br>
+            &emsp;2. Click the level buttons to describe current and desired enchantments.<br>
+            &emsp;3. Choose whether you care about the least total levels or least prior‑work, then click calculate.<br>
+            &emsp;4. Follow the step‑by‑step plan shown at the bottom of the page
+        </p>
+    </div>
+
+    <form id="planner-form" method="post" action="{{ url_for('main.calculate') }}" class="flex flex-col gap-12">
+        <section class="flex flex-col gap-4 max-w-md mx-auto">
+            <h2 class="text-lg font-semibold">1. Choose your item</h2>
+            <label class="relative w-full">
+                <select id="item-select" name="item_type"
+                        class="peer appearance-none -webkit-appearance-none
+                        w-full rounded-lg border border-slate-700 bg-slate-800/80
+                        px-4 py-2 pr-10 text-sm text-slate-100 shadow
+                        focus:border-brand focus:ring-2 focus:ring-brand">
+                    <option value="" disabled selected>— Pick Item —</option>
+                    {% for it in items %}
+                        <option value="{{ it }}">{{ it|replace('_',' ')|title }}</option>
+                    {% endfor %}
+                </select>
+                <svg class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 peer-focus:text-brand"
+                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </label>
+        </section>
+
+        <div id="dynamic-area" class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14"></div>
+
+        <section id="mode-block" class="hidden flex flex-col gap-6">
+            <h2 class="text-lg font-semibold">4. Optimize for…</h2>
+            <div class="flex flex-wrap gap-6">
+                <label class="inline-flex items-center gap-2"><input type="radio" name="mode" value="levels"
+                                                                     class="accent-brand" checked>Least total
+                    levels</label>
+                <label class="inline-flex items-center gap-2"><input type="radio" name="mode" value="prior_work"
+                                                                     class="accent-brand">Least prior-work
+                    penalty</label>
+            </div>
+            <button id="calc-btn" type="submit"
+                    class="self-start rounded-lg
+                           bg-brand hover:bg-brand/90
+                           disabled:bg-slate-600 disabled:opacity-40
+                           px-6 py-2 font-semibold text-white shadow
+                           focus:ring-2 focus:ring-brand transition"
+                    disabled>
+                Calculate Plan
+            </button>
+        </section>
+    </form>
+
+    <div id="result-block" class="scroll-mt-24 space-y-8"></div>
+
+    <style>
+        .ench-container {
+            background-color: #1e2535;
+            border: 1px solid #334155;
+            border-radius: .75rem;
+            padding: 1rem;
+            box-shadow: 0 1px 3px rgb(0 0 0 / .25);
+        }
+
+        .ench-container h3 {
+            font-size: .875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .ench-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: .5rem 1rem;
+        }
+
+        .stripe-0 {
+            background-color: #233047;
+        }
+
+        .stripe-1 {
+            background-color: #1d283a;
+        }
+
+        .ench-row.disabled-row {
+            opacity: .3;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .ench-name {
+            width: 160px;
+            font-weight: 500;
+            font-size: .875rem;
+            color: #e2e8f0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .level-cell {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+        }
+
+        .level-btn {
+            width: 2rem;
+            height: 2rem;
+            display: grid;
+            place-content: center;
+            border: 1px solid #475569;
+            background-color: #0f172a;
+            font-size: .75rem;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: .15s background-color;
+        }
+
+        .level-btn:hover {
+            background-color: rgba(59, 130, 246, .25);
+        }
+
+        .level-btn.selected {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+            color: #fff;
+        }
+
+        .level-btn:disabled {
+            opacity: .25;
+            cursor: not-allowed;
+        }
+
+        input[type=number] {
+            width: 5rem;
+            border: 1px solid #475569;
+            border-radius: .375rem;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            padding: .25rem .5rem;
+            text-align: center;
+            font-size: .875rem;
+        }
+    </style>
+
+    <script>
+        window.ENCHANTS = {{ enchants|tojson }};
+        window.NAMES = {{ pretty_names|tojson }}
+    </script>
+    <script src="{{ url_for('static', filename='planner.js') }}"></script>
+
+{% endblock %}
