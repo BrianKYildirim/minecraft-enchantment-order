@@ -174,6 +174,8 @@
     <script>
         const ENCHANTS = {{ enchants|tojson }};
         const NAMES = {{ pretty_names|tojson }}
+        const CURRENT_LV = Object.create(null);
+
 
         function prettify(ns) {
             return NAMES[ns] || ns;
@@ -239,7 +241,7 @@
                 if (key === 'des') {
                     wrap.id = 'des-block';
                     wrap.innerHTML = `<h3 class="mb-4">${title}</h3>`;
-                } else {                                   /* current-ench panel */
+                } else {
                     wrap.id = 'cur-block';
                     wrap.innerHTML = `
                         <div class="flex items-baseline justify-between mb-4">
@@ -285,6 +287,7 @@
             });
             modeBlk.classList.remove('hidden');
             updateCalcButton();
+            refreshDesiredPanel()
         }
 
         function clearRow(r) {
@@ -294,16 +297,20 @@
         }
 
         function toggle(btn, hidden, row) {
+            const isCurrent = row.closest('#cur-block');
+            const ns = row.dataset.ns;
+
             if (btn.classList.contains('selected')) {
                 clearRow(row);
-                updateDisable();
-                updateDesiredLock();
-                updateCalcButton();
+                if (isCurrent) CURRENT_LV[ns] = 0;
+                refreshDesiredPanel();
                 return;
             }
             clearRow(row);
             btn.classList.add('selected');
             hidden.value = btn.dataset.level;
+            if (isCurrent) CURRENT_LV[ns] = +btn.dataset.level;
+
             row.dataset.incompat.split(',').filter(Boolean).forEach(ns => {
                 const rr = document.querySelector(`.ench-row[data-ns="${ns}"]`);
                 rr && clearRow(rr);
@@ -311,6 +318,7 @@
             updateDisable();
             updateDesiredLock();
             updateCalcButton();
+            refreshDesiredPanel();
         }
 
         function updateDisable() {
@@ -327,17 +335,44 @@
         }
 
         function updateDesiredLock() {
-            const sel = new Set([...document.querySelectorAll('.level-btn.selected')].map(b => b.closest('.ench-row').dataset.ns));
+            const sel = new Set(
+                [...document.querySelectorAll('#des-block .level-btn.selected')].map(b =>
+                    b.closest('.ench-row').dataset.ns
+                )
+            );
             const blk = new Set(sel);
-            sel.forEach(ns => ENCHANTS.find(([n]) => n === ns)[1].incompatible.forEach(i => blk.add(i)));
-            document.querySelectorAll('#dynamic-area > div:nth-child(2) .ench-row').forEach(r => {
+            sel.forEach(ns =>
+                ENCHANTS.find(([n]) => n === ns)[1].incompatible.forEach(i => blk.add(i))
+            );
+
+            document.querySelectorAll('#des-block .ench-row').forEach(r => {
                 const ns = r.dataset.ns;
                 const keep = r.querySelector('.level-btn.selected');
                 const off = blk.has(ns) && !keep;
                 r.classList.toggle('disabled-row', off);
-                r.querySelectorAll('.level-btn').forEach(b => b.disabled = off);
+                r.querySelectorAll('.level-btn').forEach(b => (b.disabled = off));
             });
         }
+
+
+        function refreshDesiredPanel() {
+            updateDisable();
+            updateDesiredLock();
+
+            document.querySelectorAll('#des-block .ench-row').forEach(row => {
+                const have = CURRENT_LV[row.dataset.ns] || 0;
+                row.querySelectorAll('.level-btn').forEach(btn => {
+                    const lv = +btn.dataset.level;
+                    const cantChoose = lv <= have && have !== 0;
+                    if (!btn.classList.contains('selected')) {
+                        btn.disabled = btn.disabled || cantChoose;
+                        btn.style.opacity = cantChoose ? .25 : '';
+                    }
+                });
+            });
+            updateCalcButton();
+        }
+
 
         form.addEventListener('submit', e => {
             e.preventDefault();
