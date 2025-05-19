@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 
 from enchantplanner.data import ENCHANTMENTS
-from enchantplanner.utils import _pretty_name
+from enchantplanner.utils import pretty_name
 from enchantplanner.models import EnchantedItem
 from enchantplanner.calculator import plan_enchants
 from enchantplanner.exceptions import IncompatibleSelected, MergeTooExpensive
@@ -26,7 +26,7 @@ def parse_enchants(prefix: str):
 
 @main.route("/")
 def index():
-    pretty_names = {ns: _pretty_name(ns) for ns in ENCHANTMENTS}
+    pretty_names = {ns: pretty_name(ns) for ns in ENCHANTMENTS}
     return render_template(
         "index.html",
         items=ITEM_TYPES,

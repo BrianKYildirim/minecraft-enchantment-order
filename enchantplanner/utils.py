@@ -1,17 +1,20 @@
 from typing import Dict, List, Tuple
 from .data import ENCHANTMENTS
 
-_IGNORE_LOWER = {"of"}
-_SPECIAL = {"sweeping": "Sweeping Edge"}
 MAX_MERGE_LEVELS = 39  # for reference in merge routines
+_IGNORE_LOWER = {"of"}
+_SPECIAL = {
+    "sweeping": "Sweeping Edge",
+}
 
 
-def _pretty_name(ns: str) -> str:
+def pretty_name(ns: str) -> str:
     if ns in _SPECIAL:
         return _SPECIAL[ns]
     words = ns.split("_")
-    return " ".join(w.capitalize() if w not in _IGNORE_LOWER else w
-                    for w in words)
+    return " ".join(
+        w.capitalize() if w not in _IGNORE_LOWER else w
+        for w in words)
 
 
 def xp_from_levels(levels: int) -> int:
