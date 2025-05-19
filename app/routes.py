@@ -36,7 +36,7 @@ def index():
 
 @main.route("/ads.txt")
 def ads_txt():
-    return send_from_directory(app.root_path, "ads.txt", mimetype="text/plain")
+    return send_from_directory(main.root_path, "ads.txt", mimetype="text/plain")
 
 @main.route("/calculate", methods=["POST"])
 def calculate():
