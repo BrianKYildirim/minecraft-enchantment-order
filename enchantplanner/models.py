@@ -29,20 +29,16 @@ class EnchantedItem:
         ))
 
     def pretty(self) -> str:
-        """
-        Nicely formatted name, using pretty_name() for each enchant key,
-        handling multi‐level (>1) suffixes, and the _SPECIAL overrides.
-        """
         if self.enchants:
             ench_txt = ", ".join(
-                f"{pretty_name(ns)}{f' {lv}' if ENCHANTMENTS[ns]["levelMax"] > 1 else ''}"
+                # use single quotes around 'levelMax' and avoid nested f–string
+                f"{pretty_name(ns)}{' ' + str(lv) if ENCHANTMENTS[ns]['levelMax'] > 1 else ''}"
                 for ns, lv in sorted(self.enchants.items())
             )
             core = f"{self.item_type.capitalize()} ({ench_txt})"
         else:
             core = self.item_type.capitalize()
 
-        # Books never display prior‐work penalty
         if self.item_type == "book":
             return core
 
