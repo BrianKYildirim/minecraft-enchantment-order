@@ -13,8 +13,8 @@ def create_app():
     # register error handlers
     register_error_handlers(app)
 
+    @app.route("/ads.txt")
+    def ads_txt():
+        return send_from_directory(app.root_path, "ads.txt", mimetype="text/plain")
+    
     return app
-
-@app.route("/ads.txt")
-def ads_txt():
-    return send_from_directory(app.root_path, "ads.txt", mimetype="text/plain")
