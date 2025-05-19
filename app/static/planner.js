@@ -11,39 +11,48 @@ const itemSel = document.getElementById('item-select');
 const dyn = document.getElementById('dynamic-area');
 const modeBlk = document.getElementById('mode-block');
 const resBlk = document.getElementById('result-block');
+
+// store the hidden inputs per enchant for form submission
 let curInputs = {}, desInputs = {};
 
 itemSel.addEventListener('change', () => buildTables(itemSel.value));
 
 function updateCalcButton() {
-    const anyDesiredSelected = document.querySelector('#des-block .level-btn.selected');
+    const anyDesiredSelected = !!document.querySelector('#des-block .level-btn.selected');
     document.getElementById('calc-btn').disabled = !anyDesiredSelected;
 }
 
 function buildTables(item) {
     dyn.innerHTML = '';
     resBlk.style.display = 'none';
+    curInputs = {};
+    desInputs = {};
+    Object.keys(CURRENT_LV).forEach(k => delete CURRENT_LV[k]);
+
     if (!item) {
         modeBlk.classList.add('hidden');
         return;
     }
 
+    // figure out which enchants apply
     const applicable = ENCHANTS.filter(([ns, m]) => m.items.includes(item));
     const curses = ['curse_of_binding', 'curse_of_vanishing'];
     const nonCurses = applicable.map(([ns]) => ns).filter(ns => !curses.includes(ns));
 
+    // group by incompatibility clusters
     const remaining = new Set(nonCurses);
-    let groups = [];
+    const groups = [];
     while (remaining.size) {
-        const root = [...remaining][0];
-        const queue = [root], group = new Set();
+        const root = [...remaining][0],
+            queue = [root],
+            group = new Set();
         while (queue.length) {
             const x = queue.pop();
             if (!remaining.has(x)) continue;
             remaining.delete(x);
             group.add(x);
-            ENCHANTS.find(([n]) => n === x)[1].incompatible
-                .forEach(i => remaining.has(i) && queue.push(i));
+            ENCHANTS.find(([n]) => n === x)[1]
+                .incompatible.forEach(i => remaining.has(i) && queue.push(i));
         }
         groups.push([...group]);
     }
@@ -52,199 +61,218 @@ function buildTables(item) {
         if (applicable.some(([ns]) => ns === c)) groups.push([c]);
     });
 
+    // build both panels
     [['cur', '2. Current Enchantments'], ['des', '3. Desired Final Enchantments']]
         .forEach(([key, title]) => {
-            const wrap = document.createElement('div');
-            wrap.className = 'ench-container';
-            if (key === 'des') {
-                wrap.id = 'des-block';
-                wrap.innerHTML = `<h3 class="mb-4">${title}</h3>`;
-            } else {
-                wrap.id = 'cur-block';
-                wrap.innerHTML = `
-        <div class="flex items-baseline justify-between mb-4">
-          <h3 class="text-sm font-semibold m-0 leading-none">${title}</h3>
-          <label class="inline-flex items-center gap-2 text-sm">
-            Anvil Use Count:
-            <input type="number" name="prior_work" value="0" min="0" max="39"
-              class="w-16 rounded border border-slate-700 bg-slate-800
-                     px-2 py-1 text-slate-100 text-center">
-          </label>
-        </div>`;
-            }
+                const wrap = document.createElement('div');
+                wrap.className = 'ench-container';
+                if (key === 'des') {
+                    wrap.id = 'des-block';
+                    wrap.innerHTML = `<h3 class="mb-4">${title}</h3>`;
+                } else {
+                    wrap.id = 'cur-block';
+                    wrap.innerHTML = `
+                    <div class="flex items-baseline justify-between mb-4">
+                      <h3 class="text-sm font-semibold m-0 leading-none">${title}</h3>
+                      <label class="inline-flex items-center gap-2 text-sm">
+                        Anvil Use Count:
+                        <input type="number" name="prior_work" value="0" min="0" max="39"
+                          class="w-16 rounded border border-slate-700 bg-slate-800
+                                 px-2 py-1 text-slate-100 text-center">
+                      </label>
+                    </div>`;
+                }
 
-            let stripe = 0;
-            groups.forEach(group => {
-                group.forEach(ns => {
-                    const meta = ENCHANTS.find(([n]) => n === ns)[1];
-                    const row = document.createElement('div');
-                    row.className = `ench-row stripe-${stripe}`;
-                    row.dataset.ns = ns;
-                    row.dataset.incompat = meta.incompatible.join(',');
-                    row.innerHTML = `
+                let stripe = 0;
+                groups.forEach(group => {
+                    group.forEach(ns => {
+                        const meta = ENCHANTS.find(([n]) => n === ns)[1];
+                        const row = document.createElement('div');
+                        row.className = `ench-row stripe-${stripe}`;
+                        row.dataset.ns = ns;
+                        row.dataset.incompat = meta.incompatible.join(',');
+                        row.innerHTML = `
           <span class="ench-name">${prettify(ns)}</span>
           <div class="level-cell"></div>`;
-                    const cell = row.querySelector('.level-cell');
-                    const hidden = document.createElement('input');
-                    hidden.type = 'hidden';
-                    hidden.name = `${key}-${ns}`;
-                    row.appendChild(hidden);
 
-                    if (key === 'cur') curInputs[ns] = hidden;
-                    else desInputs[ns] = hidden;
+                        const cell = row.querySelector('.level-cell');
+                        const hidden = document.createElement('input');
+                        hidden.type = 'hidden';
+                        hidden.name = `${key}-${ns}`;
+                        row.appendChild(hidden);
 
-                    for (let lv = 1; lv <= meta.levelMax; lv++) {
-                        const b = document.createElement('button');
-                        b.type = 'button';
-                        b.textContent = lv;
-                        b.className = 'level-btn';
-                        b.dataset.level = lv;
-                        b.addEventListener('click', () => toggle(b, hidden, row));
-                        cell.appendChild(b);
-                    }
+                        if (key === 'cur') curInputs[ns] = hidden;
+                        else desInputs[ns] = hidden;
 
-                    wrap.appendChild(row);
+                        for (let lv = 1; lv <= meta.levelMax; lv++) {
+                            const b = document.createElement('button');
+                            b.type = 'button';
+                            b.textContent = lv;
+                            b.className = 'level-btn';
+                            b.dataset.level = lv;
+                            b.addEventListener('click', () => toggle(b, hidden, row));
+                            cell.appendChild(b);
+                        }
+
+                        wrap.appendChild(row);
+                    });
+                    stripe ^= 1;
                 });
-                stripe = 1 - stripe;
-            });
 
-            dyn.appendChild(wrap);
-        });
+                dyn.appendChild(wrap);
+            }
+        )
+    ;
 
     modeBlk.classList.remove('hidden');
-    updateCalcButton();
-    refreshDesiredPanel();
+    refreshPanels();
 }
 
-function clearRow(r) {
-    r.querySelectorAll('.level-btn.selected')
+function clearRow(row) {
+    row.querySelectorAll('.level-btn.selected')
         .forEach(b => b.classList.remove('selected'));
-    r.querySelector('input[type="hidden"]').value = '';
-    updateCalcButton();
+    row.querySelector('input[type="hidden"]').value = '';
 }
 
 function toggle(btn, hidden, row) {
-    const isCurrent = row.closest('#cur-block');
-    const ns = row.dataset.ns;
+    const isCur = !!row.closest('#cur-block'),
+        ns = row.dataset.ns;
 
     if (btn.classList.contains('selected')) {
-        // deselect branch
+        // deselect
         clearRow(row);
-        if (isCurrent) CURRENT_LV[ns] = 0;
-        // now re-run both disables & desired logic
-        refreshDesiredPanel();
-        return;
+        if (isCur) delete CURRENT_LV[ns];
+    } else {
+        // select exactly one level
+        clearRow(row);
+        btn.classList.add('selected');
+        hidden.value = btn.dataset.level;
+        if (isCur) CURRENT_LV[ns] = +btn.dataset.level;
     }
 
-    // select branch
-    clearRow(row);
-    btn.classList.add('selected');
-    hidden.value = btn.dataset.level;
-    if (isCurrent) CURRENT_LV[ns] = +btn.dataset.level;
-
-    // clear incompatible siblings
-    row.dataset.incompat.split(',').filter(Boolean)
+    // clear any direct incompatibilities
+    row.dataset.incompat.split(',')
+        .filter(Boolean)
         .forEach(i => {
-            const rr = document.querySelector(`.ench-row[data-ns="${i}"]`);
-            rr && clearRow(rr);
+            const sib = document.querySelector(`.ench-row[data-ns="${i}"]`);
+            if (sib && isCur) { // only clear them in CURRENT panel
+                clearRow(sib);
+                delete CURRENT_LV[i];
+            }
         });
 
-    // recalc disables & desired rules
-    updateDisable();
-    refreshDesiredPanel();
-    updateCalcButton();
+    refreshPanels();
 }
 
 function updateDisable() {
-    const sel = new Set(
-        [...document.querySelectorAll('.level-btn.selected')]
+    // collect all enchant types that are selected (cur+des)
+    const sel = new Set([
+        ...Object.keys(CURRENT_LV),
+        ...[...document.querySelectorAll('#des-block .level-btn.selected')]
             .map(b => b.closest('.ench-row').dataset.ns)
-    );
+    ]);
+
+    // build global incompatibility set
     const dis = new Set();
     sel.forEach(ns =>
-        ENCHANTS.find(([n]) => n === ns)[1].incompatible
-            .forEach(i => dis.add(i))
+        ENCHANTS.find(([n]) => n === ns)[1].incompatible.forEach(i => dis.add(i))
     );
 
+    // apply to every row except self-selected enchant types
     document.querySelectorAll('.ench-row').forEach(r => {
-        const ns = r.dataset.ns;
-        const keep = !!r.querySelector('.level-btn.selected');
-        const off = (dis.has(ns) || sel.has(ns)) && !keep;
+        const ns = r.dataset.ns,
+            keep = sel.has(ns),
+            off = dis.has(ns) && !keep;
         r.classList.toggle('disabled-row', off);
         r.querySelectorAll('.level-btn').forEach(b => b.disabled = off);
     });
 }
 
-function refreshDesiredPanel() {
-    // **Re-run the global disable logic for current ANY time we're re-rendering**
-    updateDisable();
-
-    // gather what current & desired ns are picked
-    const curSel = new Set(
-        Object.entries(CURRENT_LV)
-            .filter(([, lv]) => lv > 0)
-            .map(([ns]) => ns)
-    );
-    const desSel = new Set(
-        [...document.querySelectorAll('#des-block .level-btn.selected')]
-            .map(b => b.closest('.ench-row').dataset.ns)
+function refreshCurrentPanel() {
+    // look at desired selections for each enchant
+    const desiredLv = Object.fromEntries(
+        [...document.querySelectorAll('#des-block .ench-row')].map(row => {
+            const ns = row.dataset.ns;
+            const btn = row.querySelector('.level-btn.selected');
+            return [ns, btn ? +btn.dataset.level : 0];
+        })
     );
 
-    // build a set of everything incompatible with ANY picked enchant
-    const cannot = new Set();
-    for (let ns of curSel) {
-        ENCHANTS.find(([n]) => n === ns)[1].incompatible.forEach(i => cannot.add(i));
-    }
-    for (let ns of desSel) {
-        ENCHANTS.find(([n]) => n === ns)[1].incompatible.forEach(i => cannot.add(i));
-    }
+    document.querySelectorAll('#cur-block .ench-row').forEach(row => {
+        const ns = row.dataset.ns,
+            have = CURRENT_LV[ns] || 0,
+            want = desiredLv[ns] || 0,
+            btns = [...row.querySelectorAll('.level-btn')];
 
-    // now enforce desired‐panel rules
-    document.querySelectorAll('#des-block .ench-row').forEach(row => {
-        const ns = row.dataset.ns;
-        const have = CURRENT_LV[ns] || 0;
-        const btns = Array.from(row.querySelectorAll('.level-btn'));
-        const isPicked = btns.some(b => b.classList.contains('selected'));
-
-        if (!isPicked && cannot.has(ns)) {
-            // totally forbidden now
-            row.classList.add('disabled-row');
-            btns.forEach(b => {
-                b.disabled = true;
-                b.style.opacity = '.25';
-            });
-            return;
-        }
-
-        // otherwise allow only levels > current, or if already picked keep it
-        row.classList.remove('disabled-row');
         btns.forEach(b => {
-            const lv = +b.dataset.level;
-            if (b.classList.contains('selected')) {
-                b.disabled = false;
-                b.style.opacity = '';
-            } else if (lv <= have) {
+            const lv = +b.dataset.level,
+                sel = b.classList.contains('selected');
+
+            // if there's a desired target, disable any cur-level ≥ desired
+            if (!sel && want > 0 && lv >= want) {
                 b.disabled = true;
                 b.style.opacity = '.25';
+            } else if (!sel) {
+                // restore to base disabled state from updateDisable()
+                b.disabled = b.disabled;
+                b.style.opacity = '';
             } else {
+                // keep your own selection always enabled
                 b.disabled = false;
                 b.style.opacity = '';
             }
         });
     });
+}
 
+function refreshDesiredPanel() {
+    document.querySelectorAll('#des-block .ench-row').forEach(row => {
+        const ns = row.dataset.ns,
+            have = CURRENT_LV[ns] || 0,
+            btns = [...row.querySelectorAll('.level-btn')],
+            sel = btns.some(b => b.classList.contains('selected'));
+
+        // if not yet chosen, hide levels ≤ current
+        btns.forEach(b => {
+            const lv = +b.dataset.level,
+                selb = b.classList.contains('selected');
+
+            if (selb) {
+                // keep your own pick always on
+                b.disabled = false;
+                b.style.opacity = '';
+            } else if (lv <= have) {
+                // disallow any level <= your current
+                b.disabled = true;
+                b.style.opacity = '.25';
+            } else {
+                // leave everything else in its post-disable state
+                b.disabled = b.disabled;
+                b.style.opacity = '';
+            }
+        });
+    });
+}
+
+function refreshPanels() {
+    updateDisable();
+    refreshCurrentPanel();
+    refreshDesiredPanel();
     updateCalcButton();
 }
 
 form.addEventListener('submit', e => {
     e.preventDefault();
-    const fd = new FormData(form);
-    fetch(form.action, {method: 'POST', body: fd})
-        .then(r => r.redirected ? window.location = r.url : r.text())
-        .then(html => {
-            if (!html) return;
-            resBlk.innerHTML = html;
-            resBlk.style.display = 'block';
-            resBlk.scrollIntoView({behavior: 'smooth'});
-        });
+    fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form)
+    }).then(r => r.redirected
+        ? window.location = r.url
+        : r.text()
+    ).then(html => {
+        if (!html) return;
+        resBlk.innerHTML = html;
+        resBlk.style.display = 'block';
+        resBlk.scrollIntoView({behavior: 'smooth'});
+    });
 });
