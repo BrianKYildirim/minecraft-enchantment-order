@@ -65,8 +65,13 @@
                                                                      class="accent-brand">Least prior-work
                     penalty</label>
             </div>
-            <button type="submit"
-                    class="self-start rounded-lg bg-brand px-6 py-2 font-semibold text-white shadow hover:bg-brand/90 focus:ring-2 focus:ring-brand transition">
+            <button id="calc-btn" type="submit"
+                    class="self-start rounded-lg
+                           bg-brand hover:bg-brand/90
+                           disabled:bg-slate-600 disabled:opacity-40
+                           px-6 py-2 font-semibold text-white shadow
+                           focus:ring-2 focus:ring-brand transition"
+                    disabled>
                 Calculate Plan
             </button>
         </section>
@@ -183,6 +188,12 @@
 
         itemSel.addEventListener('change', () => buildTables(itemSel.value));
 
+        function updateCalcButton() {
+            const anyDesiredSelected =
+                document.querySelector('#des-block .level-btn.selected');
+            document.getElementById('calc-btn').disabled = !anyDesiredSelected;
+        }
+
         function buildTables(item) {
             dyn.innerHTML = '';
             resBlk.style.display = 'none';
@@ -221,11 +232,27 @@
                 }
             });
 
-            [['cur', '2. Current Enchantments'], ['des', '3. Desired final enchantments']].forEach(([key, title]) => {
+            [['cur', '2. Current Enchantments'], ['des', '3. Desired Final Enchantments']].forEach(([key, title]) => {
                 const wrap = document.createElement('div');
                 wrap.className = 'ench-container';
-                wrap.innerHTML = `<h3>${title}</h3>`;
-                if (key === 'cur') wrap.innerHTML += `<label class="inline-flex items-center gap-2 mb-4 text-sm">Anvil Use Count: <input type="number" name="prior_work" min="0" max="39" value="0"></label>`;
+                wrap.className = 'ench-container';
+                if (key === 'des') {
+                    wrap.id = 'des-block';
+                    wrap.innerHTML = `<h3 class="mb-4">${title}</h3>`;
+                } else {                                   /* current-ench panel */
+                    wrap.id = 'cur-block';
+                    wrap.innerHTML = `
+                        <div class="flex items-baseline justify-between mb-4">
+                            <h3 class="text-sm font-semibold m-0 leading-none">${title}</h3>
+                            <label class="inline-flex items-center gap-2 text-sm">
+                                Anvil Use Count:
+                                    <input  type="number" name="prior_work" value="0" min="0" max="39"
+                                    class="w-16 rounded border border-slate-700 bg-slate-800
+                                           px-2 py-1 text-slate-100 text-center">
+                            </label>
+                        </div>`;
+                }
+
                 let stripe = 0;
                 groups.forEach(g => {
                     g.forEach(ns => {
@@ -257,17 +284,21 @@
                 dyn.appendChild(wrap);
             });
             modeBlk.classList.remove('hidden');
+            updateCalcButton();
         }
 
         function clearRow(r) {
             r.querySelectorAll('.level-btn.selected').forEach(b => b.classList.remove('selected'));
             r.querySelector('input[type="hidden"]').value = '';
+            updateCalcButton();
         }
 
         function toggle(btn, hidden, row) {
             if (btn.classList.contains('selected')) {
                 clearRow(row);
                 updateDisable();
+                updateDesiredLock();
+                updateCalcButton();
                 return;
             }
             clearRow(row);
@@ -279,6 +310,7 @@
             });
             updateDisable();
             updateDesiredLock();
+            updateCalcButton();
         }
 
         function updateDisable() {
