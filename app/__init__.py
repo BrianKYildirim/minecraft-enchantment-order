@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, send_from_directory
 from .routes import main
 from .errors import register_error_handlers
 
@@ -14,3 +14,7 @@ def create_app():
     register_error_handlers(app)
 
     return app
+
+@app.route("/ads.txt")
+def ads_txt():
+    return send_from_directory(app.root_path, "ads.txt", mimetype="text/plain")
