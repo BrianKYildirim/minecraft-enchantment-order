@@ -61,3 +61,10 @@ def calculate():
 
     except (ValueError, IncompatibleSelected, MergeTooExpensive, RuntimeError) as e:
         return str(e), 400
+
+@main.route("/ads.txt")
+def ads_txt():
+    return send_from_directory(
+        current_app.root_path,
+        "ads.txt",
+        mimetype="text/plain")
