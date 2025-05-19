@@ -16,14 +16,14 @@ https://minecraft-enchantment-order.onrender.com
 | **Full 1.20 enchant data**                          | All vanilla items, all enchantments, weights, level caps & incompatibilities |
 | **Live validation**                                 | Impossible combinations are auto‑disabled and greyed‑out |
 | **Prior‑work input**                                | Enter an existing prior‑work penalty and it’s respected in the search |
-| **Instant results**                                 | Typical plans compute in ≲ 20 ms thanks to heavy memoisation |
+| **Instant results**                                 | Typical plans compute in ≲ 20 ms thanks to heavy memoization |
 | **No dependencies on the client**                   | Everything runs in one HTML file with vanilla JS |
 
 ---
 
 ## Video Showcase
 
-https://github.com/user-attachments/assets/47b4a68b-bdb1-458c-9afa-195a1eeb74c6
+https://github.com/user-attachments/assets/037b5237-23fe-40de-b5e3-ec3a6a344c9c
 
 
 ##  Quick Start
@@ -56,7 +56,7 @@ python app.py        # default: http://127.0.0.1:5000
 ```
 .
 ├── app.py                 ← Flask entry‑point / routes
-├── enchantmentcalc.py     ← Pure‑python optimiser (no Flask imports!)
+├── enchantmentcalc.py     ← Pure‑python optimizer (no Flask imports!)
 ├── templates/
 │   ├── base.html
 │   ├── index.html         ← main UI (all vanilla JS here)
@@ -69,7 +69,7 @@ python app.py        # default: http://127.0.0.1:5000
 ##  How the algorithm works
 
 1. **Immutable `EnchantedItem` objects** record item‑type, enchants & prior‑work.
-2. A **recursive, memoised search** (`_cheapest_single`) tries every possible
+2. A **recursive, memoized search** (`_cheapest_single`) tries every possible
    bipartition of the input books + base item, merges the cheapest sub‑results
    and remembers the best plan for each resulting prior‑work value.
 3. Vanilla anvil rules (merge cost, level stacking, incompatibilities, the
