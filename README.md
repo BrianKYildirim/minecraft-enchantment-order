@@ -39,7 +39,7 @@ pip install -r requirements.txt
 ### 2 · Run
 
 ```bash
-python app.py        # default: http://127.0.0.1:5000
+python run.py        # default: http://127.0.0.1:5000
 ```
 
 ### 3 · Enjoy
@@ -48,21 +48,6 @@ python app.py        # default: http://127.0.0.1:5000
 2. Click the level buttons to describe **current** and **desired** enchantments.
 3. Choose whether you care about *least total levels* or *least prior‑work*, then **Calculate**.
 4. Follow the step‑by‑step plan shown at the bottom of the page 
-
----
-
-##  Project Layout
-
-```
-.
-├── app.py                 ← Flask entry‑point / routes
-├── enchantmentcalc.py     ← Pure‑python optimizer (no Flask imports!)
-├── templates/
-│   ├── base.html
-│   ├── index.html         ← main UI (all vanilla JS here)
-│   └── result.html
-└── requirements.txt       ← Flask only
-```
 
 ---
 
