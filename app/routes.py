@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, send_from_directory
 
 from enchantplanner.data import ENCHANTMENTS
 from enchantplanner.utils import pretty_name
@@ -34,6 +34,9 @@ def index():
         pretty_names=pretty_names
     )
 
+@main.route("/ads.txt")
+def ads_txt():
+    return send_from_directory(app.root_path, "ads.txt", mimetype="text/plain")
 
 @main.route("/calculate", methods=["POST"])
 def calculate():
