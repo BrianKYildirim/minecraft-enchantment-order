@@ -44,8 +44,13 @@ def ads_txt():
         mimetype="text/plain"
     )
 
+
 @main.route("/calculate", methods=["POST"])
 def calculate():
+    allow = request.form.get("allow_incompat") in ("true", "on", "1")
+    from enchantplanner import models
+    models.ALLOW_INCOMPAT = allow
+
     try:
         item_type = request.form.get("item_type")
         if not item_type:

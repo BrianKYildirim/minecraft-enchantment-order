@@ -2,6 +2,8 @@ const ENCHANTS = window.ENCHANTS;
 const NAMES = window.NAMES;
 const CURRENT_LV = Object.create(null);
 
+let allowIncompat = false;
+
 function prettify(ns) {
     return NAMES[ns] || ns;
 }
@@ -64,14 +66,21 @@ function buildTables(item) {
     // build both panels
     [['cur', '2. Current Enchantments'], ['des', '3. Desired Final Enchantments']]
         .forEach(([key, title]) => {
-                const wrap = document.createElement('div');
-                wrap.className = 'ench-container';
-                if (key === 'des') {
-                    wrap.id = 'des-block';
-                    wrap.innerHTML = `<h3 class="mb-4">${title}</h3>`;
-                } else {
-                    wrap.id = 'cur-block';
-                    wrap.innerHTML = `
+            const wrap = document.createElement('div');
+            wrap.className = 'ench-container';
+            if (key === 'des') {
+                wrap.id = 'des-block';
+                wrap.innerHTML = `
+                    <div class="flex items-baseline justify-between mb-4">
+                      <h3 class="text-sm font-semibold m-0 leading-none">${title}</h3>
+                      <label class="inline-flex items-center gap-2 text-sm">
+                        Allow Incompatible:
+                        <input type="checkbox" id="allow-incompat"/>
+                      </label>
+                    </div>`;
+            } else {
+                wrap.id = 'cur-block';
+                wrap.innerHTML = `
                     <div class="flex items-baseline justify-between mb-4">
                       <h3 class="text-sm font-semibold m-0 leading-none">${title}</h3>
                       <label class="inline-flex items-center gap-2 text-sm">
@@ -81,48 +90,58 @@ function buildTables(item) {
                                  px-2 py-1 text-slate-100 text-center">
                       </label>
                     </div>`;
-                }
+            }
 
-                let stripe = 0;
-                groups.forEach(group => {
-                    group.forEach(ns => {
-                        const meta = ENCHANTS.find(([n]) => n === ns)[1];
-                        const row = document.createElement('div');
-                        row.className = `ench-row stripe-${stripe}`;
-                        row.dataset.ns = ns;
-                        row.dataset.incompat = meta.incompatible.join(',');
-                        row.innerHTML = `
+            let stripe = 0;
+            groups.forEach(group => {
+                group.forEach(ns => {
+                    const meta = ENCHANTS.find(([n]) => n === ns)[1];
+                    const row = document.createElement('div');
+                    row.className = `ench-row stripe-${stripe}`;
+                    row.dataset.ns = ns;
+                    row.dataset.incompat = meta.incompatible.join(',');
+                    row.innerHTML = `
           <span class="ench-name">${prettify(ns)}</span>
           <div class="level-cell"></div>`;
 
-                        const cell = row.querySelector('.level-cell');
-                        const hidden = document.createElement('input');
-                        hidden.type = 'hidden';
-                        hidden.name = `${key}-${ns}`;
-                        row.appendChild(hidden);
+                    const cell = row.querySelector('.level-cell');
+                    const hidden = document.createElement('input');
+                    hidden.type = 'hidden';
+                    hidden.name = `${key}-${ns}`;
+                    row.appendChild(hidden);
 
-                        if (key === 'cur') curInputs[ns] = hidden;
-                        else desInputs[ns] = hidden;
+                    if (key === 'cur') curInputs[ns] = hidden;
+                    else desInputs[ns] = hidden;
 
-                        for (let lv = 1; lv <= meta.levelMax; lv++) {
-                            const b = document.createElement('button');
-                            b.type = 'button';
-                            b.textContent = lv;
-                            b.className = 'level-btn';
-                            b.dataset.level = lv;
-                            b.addEventListener('click', () => toggle(b, hidden, row));
-                            cell.appendChild(b);
-                        }
+                    for (let lv = 1; lv <= meta.levelMax; lv++) {
+                        const b = document.createElement('button');
+                        b.type = 'button';
+                        b.textContent = lv;
+                        b.className = 'level-btn';
+                        b.dataset.level = lv;
+                        b.addEventListener('click', () => toggle(b, hidden, row));
+                        cell.appendChild(b);
+                    }
 
-                        wrap.appendChild(row);
-                    });
-                    stripe ^= 1;
+                    wrap.appendChild(row);
                 });
+                stripe ^= 1;
+            });
 
-                dyn.appendChild(wrap);
-            }
-        )
-    ;
+            dyn.appendChild(wrap);
+        });
+
+    const allowCheckbox = document.getElementById('allow-incompat');
+    const allowHidden = document.getElementById('allow-incompat-hidden');
+
+    if (allowCheckbox) {
+        allowCheckbox.addEventListener('change', e => {
+            allowIncompat = e.target.checked;
+            allowHidden.value = e.target.checked;       // send "true"/"false" to server
+            if (!allowIncompat) purgeIncompat();
+            refreshPanels();
+        });
+    }
 
     modeBlk.classList.remove('hidden');
     refreshPanels();
@@ -151,32 +170,36 @@ function toggle(btn, hidden, row) {
     }
 
     // clear any direct incompatibilities
-    row.dataset.incompat.split(',')
-        .filter(Boolean)
-        .forEach(i => {
-            const sib = document.querySelector(`.ench-row[data-ns="${i}"]`);
-            if (sib && isCur) { // only clear them in CURRENT panel
-                clearRow(sib);
-                delete CURRENT_LV[i];
-            }
-        });
+    if (!allowIncompat && isCur) {
+        row.dataset.incompat.split(',')
+            .filter(Boolean)
+            .forEach(i => {
+                const sib = document.querySelector(`.ench-row[data-ns="${i}"]`);
+                if (sib) {
+                    clearRow(sib);
+                    delete CURRENT_LV[i];
+                }
+            });
+    }
 
     refreshPanels();
 }
 
 function updateDisable() {
     // collect all enchant types that are selected (cur+des)
-    const sel = new Set([
-        ...Object.keys(CURRENT_LV),
-        ...[...document.querySelectorAll('#des-block .level-btn.selected')]
-            .map(b => b.closest('.ench-row').dataset.ns)
-    ]);
+    const curSel = Object.keys(CURRENT_LV);
+    const desSel = [...document.querySelectorAll('#des-block .level-btn.selected')]
+        .map(b => b.closest('.ench-row').dataset.ns);
+    const sel = new Set([...curSel, ...desSel]);
 
     // build global incompatibility set
     const dis = new Set();
-    sel.forEach(ns =>
-        ENCHANTS.find(([n]) => n === ns)[1].incompatible.forEach(i => dis.add(i))
-    );
+    if (!allowIncompat) {
+        sel.forEach(ns =>
+            ENCHANTS.find(([n]) => n === ns)[1]
+                .incompatible.forEach(i => dis.add(i))
+        );
+    }
 
     // apply to every row except self-selected enchant types
     document.querySelectorAll('.ench-row').forEach(r => {
@@ -223,6 +246,31 @@ function refreshCurrentPanel() {
             }
         });
     });
+}
+
+function purgeIncompat() {
+    // collect every selected enchant type
+    const selected = [...document.querySelectorAll('.level-btn.selected')]
+        .map(b => b.closest('.ench-row').dataset.ns);
+
+    // for each pair, if they conflict, clear *both* rows
+    for (let i = 0; i < selected.length; i++) {
+        for (let j = i + 1; j < selected.length; j++) {
+            const a = selected[i], b = selected[j];
+            const metaA = ENCHANTS.find(([n]) => n === a)[1];
+            const metaB = ENCHANTS.find(([n]) => n === b)[1];
+            if (metaA.incompatible.includes(b) || metaB.incompatible.includes(a)) {
+                [a, b].forEach(ns => {
+                    // clear _every_ row with that ns (cur + des)
+                    document.querySelectorAll(`.ench-row[data-ns="${ns}"]`)
+                        .forEach(row => {
+                            clearRow(row);
+                            if (row.closest('#cur-block')) delete CURRENT_LV[ns];
+                        });
+                });
+            }
+        }
+    }
 }
 
 function refreshDesiredPanel() {

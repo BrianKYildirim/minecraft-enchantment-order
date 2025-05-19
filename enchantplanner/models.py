@@ -6,6 +6,8 @@ from .utils import pretty_name, xp_from_levels, check_item_can_have, is_compatib
 from .exceptions import InvalidTarget, MergeTooExpensive, IncompatibleSelected
 from .data import ENCHANTMENTS
 
+ALLOW_INCOMPAT = False
+
 
 @dataclass(frozen=True, slots=True)
 class EnchantedItem:
@@ -48,7 +50,7 @@ class EnchantedItem:
     def from_state(item_type: str, enchants: Dict[str, int] | None = None, *, anvil_uses: int = 0):
         enchants = enchants or {}
         ok, conflicts = is_compatible(enchants)
-        if not ok:
+        if not ok and not ALLOW_INCOMPAT:
             raise ValueError(f"Incompatible enchantments: {conflicts}")
         for ns, lv in enchants.items():
             if not check_item_can_have(ns, item_type):
@@ -91,7 +93,7 @@ class EnchantedItem:
                 new_enchants[ns] = min(current + 1, ENCHANTMENTS[ns]["levelMax"])
 
         ok, conflicts = is_compatible(new_enchants)
-        if not ok:
+        if not ok and not ALLOW_INCOMPAT:
             raise IncompatibleSelected(conflicts)
 
         result_type = self.item_type if self.item_type != "book" else other.item_type
