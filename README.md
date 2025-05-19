@@ -31,7 +31,7 @@ Available as a live demo here: https://minecraft-enchantment-order.onrender.com
 
 ## Video Showcase
 
-https://github.com/user-attachments/assets/037b5237-23fe-40de-b5e3-ec3a6a344c9c
+https://github.com/user-attachments/assets/cbda99db-06b4-4a79-83dc-211111fd3fb7
 
 ---
 
