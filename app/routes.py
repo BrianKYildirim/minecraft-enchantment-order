@@ -81,17 +81,16 @@ def calculate():
 
 @main.route('/sitemap.xml', methods=['GET'])
 def sitemap():
-    # If you ever have multiple pages, you could loop them here.
     pages = [
         {
-            'loc': 'https://minecraft-enchantment-order.vercel.app/',
-            'lastmod': datetime.now().date().isoformat(),
-            'changefreq': 'monthly',
-            'priority': '1.0'
+            "loc":    "https://minecraft-enchantment-order.vercel.app/",
+            "lastmod": datetime.utcnow().date().isoformat(),
+            "changefreq": "monthly",
+            "priority":   "1.0"
         }
     ]
-
     xml = render_template('sitemap.xml', pages=pages)
-    response = make_response(xml)
+    response = make_response(xml, 200)
     response.headers['Content-Type'] = 'application/xml'
     return response
+    
