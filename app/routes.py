@@ -79,12 +79,9 @@ def calculate():
     except (ValueError, IncompatibleSelected, MergeTooExpensive, RuntimeError) as e:
         return str(e), 400
 
-
+"""
 @main.route('/sitemap.xml', methods=['GET'])
 def sitemap():
-    """
-    Generate and serve the sitemap XML.
-    """
     # If you ever have multiple pages, you could loop them here.
     pages = [
         {
@@ -99,3 +96,4 @@ def sitemap():
     response = make_response(xml)
     response.headers['Content-Type'] = 'application/xml'
     return response
+"""
