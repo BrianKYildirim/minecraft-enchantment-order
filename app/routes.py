@@ -83,8 +83,8 @@ def calculate():
 def sitemap():
     pages = [
         {
-            "loc":    "https://minecraft-enchantment-order.vercel.app/",
-            "lastmod": datetime.utcnow().date().isoformat(),
+            "loc":    "https://minecraft-enchantment-order.vercel.app",
+            "lastmod": datetime.now().date().isoformat(),
             "changefreq": "monthly",
             "priority":   "1.0"
         }
