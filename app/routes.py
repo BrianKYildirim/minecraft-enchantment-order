@@ -1,7 +1,7 @@
 import os
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, send_from_directory, \
     make_response
-import datetime
+from datetime import datetime
 
 from enchantplanner.data import ENCHANTMENTS
 from enchantplanner.utils import pretty_name
@@ -89,7 +89,7 @@ def sitemap():
     pages = [
         {
             'loc': 'https://minecraft-enchantment-order.vercel.app/',
-            'lastmod': datetime.utcnow().date().isoformat(),
+            'lastmod': datetime.now().date().isoformat(),
             'changefreq': 'monthly',
             'priority': '1.0'
         }
