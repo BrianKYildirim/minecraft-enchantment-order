@@ -1,2 +1,1 @@
-pip install -r requirements.txt
-python run.py
+web: gunicorn -w 4 app:run
