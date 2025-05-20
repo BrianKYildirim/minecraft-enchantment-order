@@ -1,4 +1,3 @@
 User-agent: *
 Allow: /
-
 Sitemap: https://minecraft-enchantment-order.vercel.app/sitemap.xml
