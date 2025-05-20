@@ -75,3 +75,12 @@ def calculate():
 
     except (ValueError, IncompatibleSelected, MergeTooExpensive, RuntimeError) as e:
         return str(e), 400
+
+
+@main.route('/sitemap.xml')
+def sitemap():
+    # Assumes sitemap.xml lives in the project root (one level up from app/)
+    project_root = os.path.abspath(os.path.join(current_app.root_path, os.pardir))
+    return send_from_directory(project_root,
+                               'sitemap.xml',
+                               mimetype='application/xml')
