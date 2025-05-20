@@ -1,5 +1,6 @@
 import os
-from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, send_from_directory
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, send_from_directory, make_response
+import datetime
 
 from enchantplanner.data import ENCHANTMENTS
 from enchantplanner.utils import pretty_name
@@ -77,10 +78,19 @@ def calculate():
         return str(e), 400
 
 
-@main.route('/sitemap.xml')
+@main.route('/sitemap.xml', methods=['GET'])
 def sitemap():
-    # Assumes sitemap.xml lives in the project root (one level up from app/)
-    project_root = os.path.abspath(os.path.join(current_app.root_path, os.pardir))
-    return send_from_directory(project_root,
-                               'sitemap.xml',
-                               mimetype='application/xml')
+    # If you ever have multiple pages, you could loop them here.
+    pages = [
+        {
+            'loc': 'https://minecraft-enchantment-order.vercel.app/',
+            'lastmod': datetime.utcnow().date().isoformat(),
+            'changefreq': 'monthly',
+            'priority': '1.0'
+        }
+    ]
+
+    xml = render_template('sitemap.xml', pages=pages)
+    response = make_response(xml)
+    response.headers['Content-Type'] = 'application/xml'
+    return response
