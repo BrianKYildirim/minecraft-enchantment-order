@@ -4,7 +4,7 @@
     { "src": "run.py", "use": "@vercel/python" }
   ],
   "routes": [
-    { "src": "/sitemap\\.xml", "dest": "/sitemap.xml" },
-    { "src": "/(.*)",        "dest": "run.py" }
+    { "src": "/sitemap\\.xml", "dest": "run.py" },
+    { "src": "/(.*)",       "dest": "run.py" }
   ]
 }
