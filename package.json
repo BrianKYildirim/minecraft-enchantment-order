@@ -1,5 +1,26 @@
 {
   "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
     "tailwindcss": "^4.1.7"
-  }
+  },
+  "name": "minecraft-enchantment-order",
+  "version": "1.0.0",
+  "description": "*A tiny Flask + Vanilla-JS web app that tells you the cheapest way to put **any** set of enchantments on any item in Minecraft (Java 1.20 +).*",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BrianKYildirim/minecraft-enchantment-order.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/BrianKYildirim/minecraft-enchantment-order/issues"
+  },
+  "homepage": "https://github.com/BrianKYildirim/minecraft-enchantment-order#readme"
 }
