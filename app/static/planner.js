@@ -64,7 +64,7 @@ function buildTables(item) {
     });
 
     // build both panels
-    [['cur', '2. Current Enchantments'], ['des', '3. Desired Final Enchantments']]
+    [['cur', '2. Current Enchants'], ['des', '3. Desired Enchants']]
         .forEach(([key, title]) => {
             const wrap = document.createElement('div');
             wrap.className = 'ench-container';

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="utf-8">
     <meta name="google-site-verification" content="LOoqyKXl6UcxlByZASi4xxDj1KgL6cejYZUSUoLZ0gY"/>
@@ -28,21 +28,7 @@
             href="{{ url_for('static', filename='favicon.ico') }}"
     >
     <link rel="canonical" href="https://minecraft-enchantment-order.vercel.app/">
-    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'media',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {DEFAULT: '#3b82f6', light: '#93c5fd'},
-                        surface: {DEFAULT: '#1e293b', light: '#f8fafc'},
-                    },
-                    boxShadow: {card: '0 1px 3px rgb(0 0 0 / .12)'}
-                }
-            }
-        }
-    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1085741965861382"
             crossorigin="anonymous"></script>
 </head>
