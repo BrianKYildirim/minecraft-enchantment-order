@@ -1,84 +1,122 @@
 {% extends 'base.html' %}
 {% block body %}
 
-    <h1 class="text-center text-3xl font-extrabold text-brand mb-4">
+    <h1 class="text-3xl text-center font-extrabold text-brand">
         Minecraft Enchant Planner
     </h1>
+    <div class="flex flex-col lg:flex-row gap-8">
+        <aside class="text-sm text-slate-300 space-y-4 mb-12 lg:mb-0 lg:w-1/3 lg:pr-6 lg:pt-6">
+            <h2 class="text-lg text-slate-300 font-bold">
+                A tool to save you levels and optimize your enchantments on armor, weapons, tools, & more.
+            </h2>
+            <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700">
+            <section class="bg-slate-800/70 p-1 rounded-lg">
+                <p>
+                    When enchanting items in <span class="font-semibold text-white">Minecraft</span>, the order
+                    in which you combine armor, weapons, and tools with books in your anvil makes a
+                    <span class="font-semibold text-white">huge difference</span>. Each time you work on an anvil,
+                    you increase the <span class="font-semibold text-white">work penalty</span>. Once that penalty
+                    gets too high, you simply can't add any more enchantments and the anvil says
+                    “<span class="font-semibold text-white">Too Expensive</span>!”.
+                    This planner finds the <span class="font-semibold text-white">optimal sequence</span> of
+                    book combinations to keep your <span class="font-semibold text-white">XP cost</span> as low as
+                    possible.
+                </p>
+            </section>
+            <section class="bg-slate-800/70 p-1 pb-4 rounded-lg">
+                <p>
+                    This tool assumes your gear and books start with
+                    <span class="font-semibold text-white">zero work penalty</span>. In other words, you haven’t
+                    previously merged lower-level books (e.g. two Level 1 → Level 2) or used the anvil on that
+                    item. To achieve <span class="font-semibold text-white">max-level enchantments</span> you
+                    should begin with high-level books (from villager trading) rather than chaining smaller books.
+                </p>
+            </section>
+            <details class="bg-slate-800/70 pb-4 rounded-lg">
+                <summary class="cursor-pointer font-semibold text-white">How To Use:</summary>
+                <p>
+                    &emsp;1. Pick an item from the drop‑down.<br>
+                    &emsp;2. The <span class="font-semibold text-white">level</span> buttons describe current
+                    & desired enchants.<br>
+                    &emsp;3. Choose the <span class="font-semibold text-white">least total levels</span> or <span
+                        class="font-semibold text-white">least prior‑work</span> option.<br>
+                    &emsp;4. <span class="font-semibold text-white">Calculate</span> & follow the step‑by‑step plan
+                    shown.
+                </p>
+            </details>
+            <details class="bg-slate-800/70 pb-4 rounded-lg">
+                <summary class="cursor-pointer font-semibold text-white">Key Features:</summary>
+                <p>
+                    &emsp;• <span class="font-semibold text-white">Interactive UI</span> that auto-disables invalid options.<br>
+                    &emsp;• <span class="font-semibold text-white">Prior-work</span> input for already-used items.<br>
+                    &emsp;• Instant, <span class="font-semibold text-white">proven-optimal</span> results (no guess-and-check).<br>
+                </p>
+            </details>
+            <details class="bg-slate-800/70 pb-4 rounded-lg">
+                <summary class="cursor-pointer font-semibold text-white">Tips &amp; Assumptions:</summary>
+                <p>
+                    &emsp;• Start all gear &amp; books at <span class="font-semibold text-white">zero prior-work</span>.<br>
+                    &emsp;• Use high-level books (IV+) for <span class="font-semibold text-white">max-level enchants</span>.<br>
+                    &emsp;• <span class="font-semibold text-white">Incompatible enchants</span> are greyed-out automatically.<br>
+                    &emsp;• Clicking a new level clears any lower choice.<br>
+                    &emsp;• Enable “<span class="font-semibold text-white">Allow incompatible</span>” only if needed.<br>
+                </p>
+            </details>
+        </aside>
 
-    <div class="mx-auto max-w-3xl text-sm text-slate-300 space-y-4 mb-12">
-        <p>
-            When enchanting items in <span class="font-semibold text-white">Minecraft</span>, the order
-            in which you combine armor, weapons, and tools with books in your anvil makes a
-            <span class="font-semibold text-white">huge difference</span>. Each time you work on an anvil,
-            you increase the <span class="font-semibold text-white">work penalty</span>. Once that penalty
-            gets too high, you simply can't add any more enchantments and the anvil says
-            “<span class="font-semibold text-white">Too Expensive</span>!”.
-            This planner finds the <span class="font-semibold text-white">optimal sequence</span> of
-            book combinations to keep your <span class="font-semibold text-white">XP cost</span> as low as possible.
-        </p>
-        <p>
-            This tool assumes your gear and books start with
-            <span class="font-semibold text-white">zero work penalty</span>. In other words, you haven’t
-            previously merged lower-level books (e.g. two Level 1 → Level 2) or used the anvil on that
-            item. To achieve <span class="font-semibold text-white">max-level enchantments</span> you
-            should begin with high-level books (from villager trading) rather than chaining smaller books.
-        </p>
-        <p>
-            Steps on how to use:<br>
-            &emsp;1. Pick an item from the drop‑down.<br>
-            &emsp;2. Click the level buttons to describe current and desired enchantments.<br>
-            &emsp;3. Choose whether you care about the least total levels or least prior‑work, then click calculate.<br>
-            &emsp;4. Follow the step‑by‑step plan shown at the bottom of the page
-        </p>
-    </div>
-
-    <form id="planner-form" method="post" action="{{ url_for('main.calculate') }}" class="flex flex-col gap-12">
-        <section class="flex flex-col gap-4 max-w-md mx-auto">
-            <h2 class="text-lg font-semibold">1. Choose your item</h2>
-            <label class="relative w-full">
-                <select id="item-select" name="item_type"
-                        class="peer appearance-none -webkit-appearance-none
+        <div class="flex space-y-6">
+            <form id="planner-form" method="post" action="{{ url_for('main.calculate') }}" class="space-y-6">
+                <div class="bg-slate-800/70 p-6 rounded-lg">
+                    <section class="mx-auto">
+                        <h2 class="text-lg font-semibold text-white mb-4">1. Choose your item</h2>
+                        <label class="relative w-full">
+                            <select id="item-select" name="item_type"
+                                    class="peer appearance-none -webkit-appearance-none
                         w-full rounded-lg border border-slate-700 bg-slate-800/80
                         px-4 py-2 pr-10 text-sm text-slate-100 shadow
                         focus:border-brand focus:ring-2 focus:ring-brand">
-                    <option value="" disabled selected>— Pick Item —</option>
-                    {% for it in items %}
-                        <option value="{{ it }}">{{ it|replace('_',' ')|title }}</option>
-                    {% endfor %}
-                </select>
-                <svg class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 peer-focus:text-brand"
-                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                </svg>
-            </label>
-        </section>
+                                <option value="" disabled selected>— Pick Item —</option>
+                                {% for it in items %}
+                                    <option value="{{ it }}">{{ it|replace('_',' ')|title }}</option>
+                                {% endfor %}
+                            </select>
+                            <svg class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 peer-focus:text-brand"
+                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                 stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </label>
+                    </section>
+                </div>
 
-        <div id="dynamic-area" class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14"></div>
+                <div id="dynamic-area" class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14"></div>
 
-        <section id="mode-block" class="hidden flex flex-col gap-6">
-            <h2 class="text-lg font-semibold">4. Optimize for…</h2>
-            <div class="flex flex-wrap gap-6">
-                <label class="inline-flex items-center gap-2"><input type="radio" name="mode" value="levels"
-                                                                     class="accent-brand" checked>Least total
-                    levels</label>
-                <label class="inline-flex items-center gap-2"><input type="radio" name="mode" value="prior_work"
-                                                                     class="accent-brand">Least prior-work
-                    penalty</label>
-            </div>
-            <button id="calc-btn" type="submit"
-                    class="self-start rounded-lg
+                <div class="bg-slate-800/70 p-6 rounded-lg">
+                    <h2 class="text-lg font-semibold text-white mb-4">4. Optimize for…</h2>
+                    <div class="flex flex-wrap gap-6 mb-4">
+                        <label class="inline-flex items-center gap-2"><input type="radio" name="mode" value="levels"
+                                                                             class="accent-brand" checked>Least total
+                            levels</label>
+                        <label class="inline-flex items-center gap-2"><input type="radio" name="mode" value="prior_work"
+                                                                             class="accent-brand">Least prior-work
+                            penalty</label>
+                    </div>
+                    <button id="calc-btn" type="submit"
+                            class="self-start rounded-lg
                            bg-brand hover:bg-brand/90
                            disabled:bg-slate-600 disabled:opacity-40
                            px-6 py-2 font-semibold text-white shadow
                            focus:ring-2 focus:ring-brand transition"
-                    disabled>
-                Calculate Plan
-            </button>
-        </section>
-        <input type="hidden" name="allow_incompat" id="allow-incompat-hidden" value="false">
-    </form>
-
-    <div id="result-block" class="scroll-mt-24 space-y-8"></div>
+                            disabled>
+                        Calculate Plan
+                    </button>
+                    <input type="hidden" name="allow_incompat" id="allow-incompat-hidden" value="false">
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="result-block" class="bg-slate-800/70 p-6 rounded-lg max-w-5xl place-self-center"></div>
 
     <style>
         .ench-container {
@@ -181,6 +219,6 @@
     </script>
     <script src="{{ url_for('static', filename='planner.js') }}"></script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1085741965861382"
-     crossorigin="anonymous"></script>
+            crossorigin="anonymous"></script>
 
 {% endblock %}
