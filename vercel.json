@@ -1,4 +1,5 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "builds": [
     { "src": "run.py", "use": "@vercel/python" }
@@ -6,5 +7,10 @@
   "routes": [
     { "src": "/sitemap\\.xml", "dest": "run.py" },
     { "src": "/(.*)",       "dest": "run.py" }
-  ]
+  ],
+  "git": {
+    "deploymentEnabled": {
+      "dev": false
+    }
+  }
 }
