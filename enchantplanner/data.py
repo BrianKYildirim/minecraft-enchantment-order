@@ -32,7 +32,7 @@ ENCHANTMENTS: dict[str, dict] = {
         "incompatible": ["riptide"],
         "items": ["trident"],
     },
-    "denisty": {
+    "density": {
         "levelMax": 5,
         "weight": 1,
         "incompatible": ["breach", "smite", "bane_of_arthropods"],
