@@ -82,32 +82,4 @@ python run.py
 
 ---
 
-## Project Structure
-
-```
-minecraft-enchantment-order/
-├── app/                    # Flask application package
-│   ├── static/             # Static assets
-│   │   ├── favicon.ico
-│   │   └── planner.js      # Frontend logic
-│   ├── templates/          # Jinja2 templates
-│   │   ├── base.html
-│   │   ├── index.html
-│   │   └── result.html
-│   ├── __init__.py         # App factory & config
-│   ├── errors.py           # Error handlers
-│   └── routes.py           # Blueprint routes
-├── enchantmentplanner/     # Core enchantment logic
-│   ├── calculator.py       # plan_enchants & search algorithm
-│   ├── data.py             # Enchantments metadata
-│   ├── exceptions.py       # Custom exceptions
-│   ├── models.py           # EnchantedItem, Step, MergePlan
-│   └── utils.py            # Helpers (xp formula, naming, compat)
-├── README.md
-├── requirements.txt
-└── run.py                  # Launch script
-```
-
----
-
 *Happy enchanting!*
