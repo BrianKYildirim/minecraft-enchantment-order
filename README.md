@@ -12,7 +12,6 @@ Available as a live demo here: [Minecraft Enchant Planner](https://minecraft-enc
 2. [Video Showcase](#video-showcase) 
 3. [Quick Start](#quick-start)  
 4. [How It Works](#how-it-works)  
-5. [Project Structure](#project-structure)
 
 ---
 
@@ -31,7 +30,7 @@ Available as a live demo here: [Minecraft Enchant Planner](https://minecraft-enc
 
 ## Video Showcase
 
-https://github.com/user-attachments/assets/cbda99db-06b4-4a79-83dc-211111fd3fb7
+https://github.com/user-attachments/assets/989052b7-e775-4d81-82d2-7af33b6cb36f
 
 ---
 
