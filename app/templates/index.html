@@ -4,67 +4,9 @@
     <h1 class="text-3xl text-center font-extrabold text-brand">
         Minecraft Enchant Planner
     </h1>
-    <div class="flex flex-col lg:flex-row gap-8">
-        <aside class="text-sm text-slate-300 space-y-4 mb-12 lg:mb-0 lg:w-1/3 lg:pr-6 lg:pt-6">
-            <h2 class="text-lg text-slate-300 font-bold">
-                A tool to save you levels and optimize your enchantments on armor, weapons, tools, & more.
-            </h2>
-            <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700">
-            <section class="bg-slate-800/70 p-1 rounded-lg">
-                <p>
-                    When enchanting items in <span class="font-semibold text-white">Minecraft</span>, the order
-                    in which you combine armor, weapons, and tools with books in your anvil makes a
-                    <span class="font-semibold text-white">huge difference</span>. Each time you work on an anvil,
-                    you increase the <span class="font-semibold text-white">work penalty</span>. Once that penalty
-                    gets too high, you simply can't add any more enchantments and the anvil says
-                    “<span class="font-semibold text-white">Too Expensive</span>!”.
-                    This planner finds the <span class="font-semibold text-white">optimal sequence</span> of
-                    book combinations to keep your <span class="font-semibold text-white">XP cost</span> as low as
-                    possible.
-                </p>
-            </section>
-            <section class="bg-slate-800/70 p-1 pb-4 rounded-lg">
-                <p>
-                    This tool assumes your gear and books start with
-                    <span class="font-semibold text-white">zero work penalty</span>. In other words, you haven’t
-                    previously merged lower-level books (e.g. two Level 1 → Level 2) or used the anvil on that
-                    item. To achieve <span class="font-semibold text-white">max-level enchantments</span> you
-                    should begin with high-level books (from villager trading) rather than chaining smaller books.
-                </p>
-            </section>
-            <details class="bg-slate-800/70 pb-4 rounded-lg">
-                <summary class="cursor-pointer font-semibold text-white">How To Use:</summary>
-                <p>
-                    &emsp;1. Pick an item from the drop‑down.<br>
-                    &emsp;2. The <span class="font-semibold text-white">level</span> buttons describe current
-                    & desired enchants.<br>
-                    &emsp;3. Choose the <span class="font-semibold text-white">least total levels</span> or <span
-                        class="font-semibold text-white">least prior‑work</span> option.<br>
-                    &emsp;4. <span class="font-semibold text-white">Calculate</span> & follow the step‑by‑step plan
-                    shown.
-                </p>
-            </details>
-            <details class="bg-slate-800/70 pb-4 rounded-lg">
-                <summary class="cursor-pointer font-semibold text-white">Key Features:</summary>
-                <p>
-                    &emsp;• <span class="font-semibold text-white">Interactive UI</span> that auto-disables invalid options.<br>
-                    &emsp;• <span class="font-semibold text-white">Prior-work</span> input for already-used items.<br>
-                    &emsp;• Instant, <span class="font-semibold text-white">proven-optimal</span> results (no guess-and-check).<br>
-                </p>
-            </details>
-            <details class="bg-slate-800/70 pb-4 rounded-lg">
-                <summary class="cursor-pointer font-semibold text-white">Tips &amp; Assumptions:</summary>
-                <p>
-                    &emsp;• Start all gear &amp; books at <span class="font-semibold text-white">zero prior-work</span>.<br>
-                    &emsp;• Use high-level books (IV+) for <span class="font-semibold text-white">max-level enchants</span>.<br>
-                    &emsp;• <span class="font-semibold text-white">Incompatible enchants</span> are greyed-out automatically.<br>
-                    &emsp;• Clicking a new level clears any lower choice.<br>
-                    &emsp;• Enable “<span class="font-semibold text-white">Allow incompatible</span>” only if needed.<br>
-                </p>
-            </details>
-        </aside>
 
-        <div class="flex space-y-6">
+    <div class="flex flex-col lg:flex-row gap-8 lg:px-24">
+        <div class="flex space-y-6 lg:w-2/3">
             <form id="planner-form" method="post" action="{{ url_for('main.calculate') }}" class="space-y-6">
                 <div class="bg-slate-800/70 p-6 rounded-lg">
                     <section class="mx-auto">
@@ -112,11 +54,75 @@
                         Calculate Plan
                     </button>
                     <input type="hidden" name="allow_incompat" id="allow-incompat-hidden" value="false">
+                    <div id="result-block" class="bg-slate-800/70 lg:px-6 pb-6 rounded-lg max-w-5xl"></div>
                 </div>
             </form>
         </div>
+        <aside class="text-sm text-slate-300 space-y-4 mb-12 lg:mb-0 lg:w-1/3 lg:pr-6 lg:pt-6">
+            <h2 class="text-lg text-slate-300 font-bold">
+                A tool to save you levels and optimize your enchantments on armor, weapons, tools, & more.
+            </h2>
+            <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700">
+            <section class="bg-slate-800/70 p-1 rounded-lg">
+                <p>
+                    When enchanting items in <span class="font-semibold text-white">Minecraft</span>, the order
+                    in which you combine armor, weapons, and tools with books in your anvil makes a
+                    <span class="font-semibold text-white">huge difference</span>. Each time you work on an anvil,
+                    you increase the <span class="font-semibold text-white">work penalty</span>. Once that penalty
+                    gets too high, you simply can't add any more enchantments and the anvil says
+                    “<span class="font-semibold text-white">Too Expensive</span>!”.
+                    This planner finds the <span class="font-semibold text-white">optimal sequence</span> of
+                    book combinations to keep your <span class="font-semibold text-white">XP cost</span> as low as
+                    possible.
+                </p>
+            </section>
+            <section class="bg-slate-800/70 p-1 pb-4 rounded-lg">
+                <p>
+                    This tool assumes your gear and books start with
+                    <span class="font-semibold text-white">zero work penalty</span>. In other words, you haven’t
+                    previously merged lower-level books (e.g. two Level 1 → Level 2) or used the anvil on that
+                    item. To achieve <span class="font-semibold text-white">max-level enchantments</span> you
+                    should begin with high-level books (from villager trading) rather than chaining smaller books.
+                </p>
+            </section>
+            <details class="bg-slate-800/70 pb-4 rounded-lg">
+                <summary class="cursor-pointer font-semibold text-white">How To Use:</summary>
+                <p>
+                    &emsp;1. Pick an item from the drop‑down.<br>
+                    &emsp;2. The <span class="font-semibold text-white">level</span> buttons describe current
+                    & desired enchants.<br>
+                    &emsp;3. Choose the <span class="font-semibold text-white">least total levels</span> or <span
+                        class="font-semibold text-white">least prior‑work</span> option.<br>
+                    &emsp;4. <span class="font-semibold text-white">Calculate</span> & follow the step‑by‑step plan
+                    shown.
+                </p>
+            </details>
+            <details class="bg-slate-800/70 pb-4 rounded-lg">
+                <summary class="cursor-pointer font-semibold text-white">Key Features:</summary>
+                <p>
+                    &emsp;• <span class="font-semibold text-white">Interactive UI</span> that auto-disables invalid
+                    options.<br>
+                    &emsp;• <span class="font-semibold text-white">Prior-work</span> input for already-used items.<br>
+                    &emsp;• Instant, <span class="font-semibold text-white">proven-optimal</span> results (no
+                    guess-and-check).<br>
+                </p>
+            </details>
+            <details class="bg-slate-800/70 pb-4 rounded-lg">
+                <summary class="cursor-pointer font-semibold text-white">Tips &amp; Assumptions:</summary>
+                <p>
+                    &emsp;• Start all gear &amp; books at <span class="font-semibold text-white">zero prior-work</span>.<br>
+                    &emsp;• Use high-level books (IV+) for <span
+                        class="font-semibold text-white">max-level enchants</span>.<br>
+                    &emsp;• <span class="font-semibold text-white">Incompatible enchants</span> are greyed-out
+                    automatically.<br>
+                    &emsp;• Clicking a new level clears any lower choice.<br>
+                    &emsp;• Enable “<span class="font-semibold text-white">Allow incompatible</span>” only if
+                    needed.<br>
+                </p>
+            </details>
+        </aside>
     </div>
-    <div id="result-block" class="bg-slate-800/70 px-6 pb-6 rounded-lg max-w-5xl place-self-center"></div>
+
 
     <style>
         .ench-container {
