@@ -1,6 +1,6 @@
 # Minecraft Enchant Planner
 
-*A tiny Flask + Vanilla-JS web app that tells you the cheapest way to put **any** set of enchantments on any item in Minecraft (Java 1.20 +).*
+*A tiny Flask + Vanilla-JS web app that tells you the cheapest way to put **any** set of enchantments on any item in Minecraft (Java 1.21 +).*
 
 Available as a live demo here: [Minecraft Enchant Planner](https://minecraft-enchantment-order.vercel.app/)
 
