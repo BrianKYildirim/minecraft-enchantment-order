@@ -340,6 +340,7 @@ ENCHANTMENTS: dict[str, dict] = {
             "turtle_shell",
             "crossbow",
             "mace",
+            "spear",
         ],
     },
 }
