@@ -7,7 +7,7 @@ ENCHANTMENTS: dict[str, dict] = {
         "levelMax": 1,
         "weight": 2,
         "incompatible": [],
-        "items": ["helmet"],
+        "items": ["helmet", "turtle_shell"],
     },
     "bane_of_arthropods": {
         "levelMax": 5,
